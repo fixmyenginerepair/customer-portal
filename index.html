@@ -1,0 +1,3992 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Customer Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+            colors: {
+              navy: { 900: "#0f172a", 800: "#1e293b", 700: "#334155" },
+              indigo: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                200: "#c7d2fe",
+                300: "#a5b4fc",
+                400: "#818cf8",
+                500: "#6366f1",
+                600: "#4f46e5",
+                700: "#4338ca",
+              },
+              surface: {
+                50: "#f8fafc",
+                100: "#f1f5f9",
+                200: "#e2e8f0",
+                300: "#cbd5e1",
+                400: "#94a3b8",
+                500: "#64748b",
+                600: "#475569",
+                700: "#334155",
+                800: "#1e293b",
+              },
+              success: {
+                50: "#f0fdf4",
+                100: "#dcfce7",
+                500: "#22c55e",
+                600: "#16a34a",
+                700: "#15803d",
+              },
+              danger: {
+                50: "#fef2f2",
+                100: "#fee2e2",
+                500: "#ef4444",
+                600: "#dc2626",
+                700: "#b91c1c",
+              },
+              warning: {
+                50: "#fffbeb",
+                100: "#fef3c7",
+                500: "#f59e0b",
+                600: "#d97706",
+              },
+              info: {
+                50: "#eff6ff",
+                100: "#dbeafe",
+                500: "#3b82f6",
+                600: "#2563eb",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        margin: 0;
+        background: #f8fafc;
+      }
+      .sidebar {
+        width: 240px;
+        min-height: 100vh;
+        background: #0f172a;
+        color: #e2e8f0;
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        z-index: 40;
+      }
+      .main-area {
+        margin-left: 240px;
+        min-height: 100vh;
+        background: #f8fafc;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+        font-size: 14px;
+        font-weight: 500;
+        color: #94a3b8;
+        margin: 2px 12px;
+      }
+      .nav-item:hover {
+        background: #1e293b;
+        color: #e2e8f0;
+      }
+      .nav-item.active {
+        background: #4f46e5;
+        color: #fff;
+      }
+      .stat-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+      }
+      .stat-card-clickable {
+        background: #fff;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        cursor: pointer;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+      .stat-card-clickable:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 9999px;
+        font-size: 12px;
+        font-weight: 600;
+        line-height: 1.4;
+      }
+      .badge-draft {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .badge-sent {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      .badge-paid {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      .badge-overdue {
+        background: #fee2e2;
+        color: #dc2626;
+      }
+      .badge-in-progress {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      .badge-completed {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      .badge-waiting-parts {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .badge-pending {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .badge-ordered {
+        background: #dbeafe;
+        color: #2563eb;
+      }
+      .badge-in-transit {
+        background: #fef3c7;
+        color: #d97706;
+      }
+      .badge-received {
+        background: #dcfce7;
+        color: #16a34a;
+      }
+      .badge-cancelled {
+        background: #f1f5f9;
+        color: #64748b;
+      }
+      .btn-primary {
+        background: #6366f1;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.15s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .btn-primary:hover {
+        background: #4f46e5;
+      }
+      .btn-secondary {
+        background: #f1f5f9;
+        color: #334155;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 10px;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .btn-secondary:hover {
+        background: #e2e8f0;
+      }
+      .btn-danger {
+        background: #fef2f2;
+        color: #dc2626;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 13px;
+        cursor: pointer;
+      }
+      .btn-danger:hover {
+        background: #fee2e2;
+      }
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 13px;
+        border-radius: 8px;
+      }
+      .data-table {
+        width: 100%;
+        text-align: left;
+        border-collapse: separate;
+        border-spacing: 0;
+      }
+      .data-table thead th {
+        padding: 12px 16px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #64748b;
+        background: #f8fafc;
+        border-bottom: 1px solid #e2e8f0;
+      }
+      .data-table tbody td {
+        padding: 14px 16px;
+        font-size: 14px;
+        color: #334155;
+        border-bottom: 1px solid #f1f5f9;
+      }
+      .data-table tbody tr:hover {
+        background: #f8fafc;
+      }
+      .data-table tbody tr:nth-child(even) {
+        background: #fafbfd;
+      }
+      .data-table tbody tr:nth-child(even):hover {
+        background: #f1f5f9;
+      }
+      .modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 50;
+        animation: fadeIn 0.15s;
+      }
+      .modal-content {
+        background: #fff;
+        border-radius: 20px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        max-height: 90vh;
+        overflow-y: auto;
+        width: 95%;
+      }
+      .modal-sm {
+        max-width: 540px;
+      }
+      .modal-lg {
+        max-width: 900px;
+      }
+      .modal-xl {
+        max-width: 1100px;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      .form-label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #334155;
+        margin-bottom: 6px;
+      }
+      .form-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        font-size: 14px;
+        color: #1e293b;
+        background: #fff;
+        transition:
+          border-color 0.15s,
+          box-shadow 0.15s;
+        outline: none;
+        font-family: inherit;
+      }
+      .form-input:focus {
+        border-color: #818cf8;
+        box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+      }
+      .form-input.error {
+        border-color: #ef4444;
+      }
+      .form-input::placeholder {
+        color: #94a3b8;
+      }
+      textarea.form-input {
+        resize: vertical;
+        min-height: 80px;
+      }
+      .toast-container {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+      .toast {
+        padding: 14px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+        animation: slideIn 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 280px;
+      }
+      .toast-success {
+        background: #f0fdf4;
+        color: #15803d;
+        border-left: 4px solid #22c55e;
+      }
+      .toast-error {
+        background: #fef2f2;
+        color: #b91c1c;
+        border-left: 4px solid #ef4444;
+      }
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #94a3b8;
+      }
+      .empty-state svg,
+      .empty-state i {
+        margin: 0 auto 16px;
+      }
+      .action-btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 6px;
+        border-radius: 6px;
+        color: #64748b;
+        transition: all 0.15s;
+      }
+      .action-btn:hover {
+        background: #f1f5f9;
+        color: #334155;
+      }
+      .paypal-link-box {
+        background: #f0fdf4;
+        border: 1px solid #dcfce7;
+        border-radius: 12px;
+        padding: 16px;
+        margin-top: 12px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .paypal-link-box a {
+        color: #4f46e5;
+        word-break: break-all;
+        font-size: 14px;
+      }
+      .pill-counter {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 13px;
+        font-weight: 600;
+      }
+      @media print {
+        .sidebar,
+        .main-header,
+        .no-print {
+          display: none !important;
+        }
+        .main-area {
+          margin-left: 0 !important;
+        }
+        .print-view {
+          padding: 0 !important;
+        }
+      }
+      @media (max-width: 1023px) {
+        .sidebar {
+          transform: translateX(-100%);
+          transition: transform 0.2s;
+        }
+        .sidebar.open {
+          transform: translateX(0);
+        }
+        .main-area {
+          margin-left: 0;
+        }
+      }
+    </style>
+  </head>
+  <body data-id="0">
+    <app-icon
+      data-id="1"
+      hidden
+      data-icon="layout-dashboard"
+      data-palette="Blue"
+    ></app-icon>
+
+    <!-- SIDEBAR -->
+    <aside data-id="2" class="sidebar" id="sidebar-nav-s1k2">
+      <div data-id="3" style="padding: 24px 20px 16px">
+        <div data-id="4" style="display: flex; align-items: center; gap: 10px">
+          <span data-id="5" style="font-size: 22px">⚡</span>
+          <span
+            data-id="6"
+            style="
+              font-size: 18px;
+              font-weight: 700;
+              color: #fff;
+              letter-spacing: -0.02em;
+            "
+            >ClientPortal</span
+          >
+        </div>
+      </div>
+      <nav data-id="7" style="flex: 1; padding: 8px 0" id="nav-links-n4v1">
+        <div data-id="8" class="nav-item active" data-view="dashboard">
+          <i data-id="9" data-lucide="layout-dashboard" class="w-5 h-5"></i>
+          Dashboard
+        </div>
+        <div data-id="10" class="nav-item" data-view="customers">
+          <i data-id="11" data-lucide="users" class="w-5 h-5"></i> Customers
+        </div>
+        <div data-id="12" class="nav-item" data-view="invoices">
+          <i data-id="13" data-lucide="file-text" class="w-5 h-5"></i> Invoices
+        </div>
+        <div data-id="14" class="nav-item" data-view="payments">
+          <i data-id="15" data-lucide="credit-card" class="w-5 h-5"></i>
+          Payments
+        </div>
+        <div data-id="16" class="nav-item" data-view="repairs">
+          <i data-id="17" data-lucide="wrench" class="w-5 h-5"></i> Repair
+          Received
+        </div>
+        <div data-id="18" class="nav-item" data-view="parts">
+          <i data-id="19" data-lucide="package" class="w-5 h-5"></i> Parts Order
+        </div>
+        <div data-id="20" class="nav-item" data-view="settings">
+          <i data-id="21" data-lucide="settings" class="w-5 h-5"></i> Settings
+        </div>
+      </nav>
+      <div
+        data-id="22"
+        style="padding: 16px 20px; border-top: 1px solid #1e293b"
+      >
+        <div data-id="23" style="display: flex; align-items: center; gap: 10px">
+          <div
+            data-id="24"
+            style="
+              width: 36px;
+              height: 36px;
+              border-radius: 50%;
+              background: #4f46e5;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 14px;
+              font-weight: 700;
+              color: #fff;
+            "
+          >
+            J
+          </div>
+          <div data-id="25">
+            <div
+              data-id="26"
+              style="font-size: 13px; font-weight: 600; color: #e2e8f0"
+            >
+              John
+            </div>
+            <div data-id="27" style="font-size: 11px; color: #64748b">
+              Administrator
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MOBILE MENU BUTTON -->
+    <button
+      data-id="28"
+      id="mobile-menu-btn-m1b2"
+      class="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-xl shadow-md"
+      style="display: none"
+    >
+      <i
+        data-id="29"
+        data-lucide="menu"
+        class="w-6 h-6"
+        style="color: #334155"
+      ></i>
+    </button>
+
+    <!-- MAIN AREA -->
+    <div data-id="30" class="main-area" id="main-area-m4a1">
+      <!-- Header -->
+      <header
+        data-id="31"
+        class="main-header"
+        id="page-header-h1d2"
+        style="
+          background: #fff;
+          border-bottom: 1px solid #e2e8f0;
+          padding: 16px 32px;
+          display: flex;
+          align-items: center;
+          justify-content: between;
+        "
+      >
+        <div
+          data-id="32"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+          "
+        >
+          <h1
+            data-id="33"
+            id="page-title-t3l1"
+            style="font-size: 20px; font-weight: 700; color: #0f172a; margin: 0"
+          >
+            Dashboard
+          </h1>
+          <div data-id="34" id="header-actions-a1c2"></div>
+        </div>
+      </header>
+
+      <!-- CONTENT -->
+      <div data-id="35" style="padding: 28px 32px" id="content-area-c1a2">
+        <!-- Views injected by JS -->
+      </div>
+
+      <footer data-id="36" class="py-6 text-center no-print">
+        <p data-id="37" style="font-size: 12px; color: #94a3b8">
+          Made by Copilot
+        </p>
+      </footer>
+    </div>
+
+    <!-- MODAL CONTAINER -->
+    <div data-id="38" id="modal-container-m1c2"></div>
+
+    <!-- TOAST CONTAINER -->
+    <div data-id="39" class="toast-container" id="toast-container-t1c2"></div>
+
+    <script>
+      if (
+        typeof lucide !== "undefined" &&
+        typeof lucide.createIcons === "function"
+      ) {
+        lucide.createIcons();
+      }
+
+      // ── STORAGE LAYER ──
+      const Storage = {
+        async get(key, fallback) {
+          try {
+            if (window.AppSDK && window.AppSDK.storage) {
+              const val = await window.AppSDK.storage.get(key);
+              if (val !== null && val !== undefined) return val;
+            }
+          } catch (e) {}
+          try {
+            const ls = localStorage.getItem("cp_" + key);
+            if (ls !== null && ls !== undefined) return JSON.parse(ls);
+          } catch (e) {}
+          return fallback;
+        },
+        async set(key, val) {
+          try {
+            if (window.AppSDK && window.AppSDK.storage) {
+              await window.AppSDK.storage.set(key, val);
+            }
+          } catch (e) {}
+          try {
+            localStorage.setItem("cp_" + key, JSON.stringify(val));
+          } catch (e) {}
+        },
+      };
+
+      // ── GLOBAL STATE ──
+      let customers = [];
+      let invoices = [];
+      let repairs = [];
+      let parts = [];
+      let settings = {};
+      let invoiceCounter = 1;
+      let repairCounter = 1;
+      let currentView = "dashboard";
+      let filterCustomerId = null;
+
+      // ── DATE HELPERS ──
+      function formatDate(d) {
+        if (!d) return "";
+        const dt = new Date(d + "T00:00:00");
+        return dt.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      }
+      function todayStr() {
+        const d = new Date();
+        return d.toISOString().split("T")[0];
+      }
+      function plus30() {
+        const d = new Date();
+        d.setDate(d.getDate() + 30);
+        return d.toISOString().split("T")[0];
+      }
+      function fmtMoney(n) {
+        return (
+          "$" +
+          Number(n || 0)
+            .toFixed(2)
+            .replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+        );
+      }
+      function padInv(n) {
+        return "INV-" + String(n).padStart(4, "0");
+      }
+      function padRep(n) {
+        return "REP-" + String(n).padStart(4, "0");
+      }
+      function uid() {
+        return (
+          Date.now().toString(36) + Math.random().toString(36).substr(2, 6)
+        );
+      }
+
+      // ── SCHEMA NORMALIZERS ──
+      function normalizeCustomer(c) {
+        if (!c || typeof c !== "object") return null;
+        return {
+          id: c.id || uid(),
+          name: typeof c.name === "string" ? c.name.trim() : "",
+          email: typeof c.email === "string" ? c.email.trim() : "",
+          phone: typeof c.phone === "string" ? c.phone.trim() : "",
+          company: typeof c.company === "string" ? c.company.trim() : "",
+          address: typeof c.address === "string" ? c.address.trim() : "",
+          notes: typeof c.notes === "string" ? c.notes.trim() : "",
+          createdAt: c.createdAt || todayStr(),
+          updatedAt: c.updatedAt || todayStr(),
+        };
+      }
+
+      function normalizeInvoice(i) {
+        if (!i || typeof i !== "object") return null;
+        var lineItems = Array.isArray(i.lineItems)
+          ? i.lineItems
+              .map(function (li) {
+                if (!li || typeof li !== "object") return null;
+                var qty = Math.max(0, parseFloat(li.qty) || 0);
+                var unitPrice = Math.max(0, parseFloat(li.unitPrice) || 0);
+                var taxPct = Math.max(0, parseFloat(li.taxPct) || 0);
+                var lineTotal = qty * unitPrice;
+                return {
+                  description:
+                    typeof li.description === "string"
+                      ? li.description.trim()
+                      : "",
+                  qty: qty,
+                  unitPrice: unitPrice,
+                  taxPct: taxPct,
+                  lineTotal: lineTotal,
+                };
+              })
+              .filter(Boolean)
+          : [];
+        var subtotal = lineItems.reduce(function (s, li) {
+          return s + li.lineTotal;
+        }, 0);
+        var taxTotal = lineItems.reduce(function (s, li) {
+          return s + li.lineTotal * (li.taxPct / 100);
+        }, 0);
+        var total = subtotal + taxTotal;
+        var validStatuses = ["draft", "sent", "paid", "overdue"];
+        return {
+          id: i.id || uid(),
+          invoiceNumber: i.invoiceNumber || "INV-????",
+          customerId: i.customerId || "",
+          status: validStatuses.includes(i.status) ? i.status : "draft",
+          issueDate: i.issueDate || todayStr(),
+          dueDate: i.dueDate || plus30(),
+          lineItems: lineItems,
+          subtotal: i.subtotal != null ? parseFloat(i.subtotal) : subtotal,
+          taxTotal: i.taxTotal != null ? parseFloat(i.taxTotal) : taxTotal,
+          total: i.total != null ? parseFloat(i.total) : total,
+          notes: typeof i.notes === "string" ? i.notes.trim() : "",
+          paymentTerms:
+            typeof i.paymentTerms === "string" ? i.paymentTerms.trim() : "",
+          paypalEmail:
+            typeof i.paypalEmail === "string" ? i.paypalEmail.trim() : "",
+          paypalLink:
+            typeof i.paypalLink === "string" ? i.paypalLink.trim() : "",
+          createdAt: i.createdAt || todayStr(),
+          updatedAt: i.updatedAt || todayStr(),
+        };
+      }
+
+      function normalizeRepair(r) {
+        if (!r || typeof r !== "object") return null;
+        var validStatuses = [
+          "pending",
+          "in-progress",
+          "waiting-parts",
+          "completed",
+        ];
+        return {
+          id: r.id || uid(),
+          repairNumber: r.repairNumber || "REP-????",
+          customerId: r.customerId || "",
+          invoiceId: r.invoiceId || "",
+          partIds: Array.isArray(r.partIds)
+            ? r.partIds.filter(function (id) {
+                return typeof id === "string" && id;
+              })
+            : [],
+          deviceType:
+            typeof r.deviceType === "string" ? r.deviceType.trim() : "",
+          issue: typeof r.issue === "string" ? r.issue.trim() : "",
+          status: validStatuses.includes(r.status) ? r.status : "pending",
+          receivedDate: r.receivedDate || todayStr(),
+          estimatedCompletion: r.estimatedCompletion || plus30(),
+          techNotes: typeof r.techNotes === "string" ? r.techNotes.trim() : "",
+          estimatedCost: Math.max(0, parseFloat(r.estimatedCost) || 0),
+          createdAt: r.createdAt || todayStr(),
+          updatedAt: r.updatedAt || todayStr(),
+        };
+      }
+
+      function normalizePart(p) {
+        if (!p || typeof p !== "object") return null;
+        var validStatuses = ["ordered", "in-transit", "received", "cancelled"];
+        return {
+          id: p.id || uid(),
+          repairId: p.repairId || "",
+          partName: typeof p.partName === "string" ? p.partName.trim() : "",
+          partNumber:
+            typeof p.partNumber === "string" ? p.partNumber.trim() : "",
+          supplier: typeof p.supplier === "string" ? p.supplier.trim() : "",
+          qty: Math.max(1, parseInt(p.qty) || 1),
+          unitCost: Math.max(0, parseFloat(p.unitCost) || 0),
+          status: validStatuses.includes(p.status) ? p.status : "ordered",
+          orderedDate: p.orderedDate || todayStr(),
+          expectedDate: p.expectedDate || plus30(),
+          notes: typeof p.notes === "string" ? p.notes.trim() : "",
+          createdAt: p.createdAt || todayStr(),
+          updatedAt: p.updatedAt || todayStr(),
+        };
+      }
+
+      function normalizeSettings(s) {
+        var defaults = {
+          businessName: "",
+          businessEmail: "",
+          businessPhone: "",
+          businessAddress: "",
+          defaultTaxRate: 0,
+          defaultPaymentTerms: "Payment due within 30 days",
+          paypalUsername: "",
+        };
+        if (!s || typeof s !== "object") return defaults;
+        return {
+          businessName:
+            typeof s.businessName === "string"
+              ? s.businessName.trim()
+              : defaults.businessName,
+          businessEmail:
+            typeof s.businessEmail === "string"
+              ? s.businessEmail.trim()
+              : defaults.businessEmail,
+          businessPhone:
+            typeof s.businessPhone === "string"
+              ? s.businessPhone.trim()
+              : defaults.businessPhone,
+          businessAddress:
+            typeof s.businessAddress === "string"
+              ? s.businessAddress.trim()
+              : defaults.businessAddress,
+          defaultTaxRate: Math.max(0, parseFloat(s.defaultTaxRate) || 0),
+          defaultPaymentTerms:
+            typeof s.defaultPaymentTerms === "string"
+              ? s.defaultPaymentTerms.trim()
+              : defaults.defaultPaymentTerms,
+          paypalUsername:
+            typeof s.paypalUsername === "string"
+              ? s.paypalUsername.trim()
+              : defaults.paypalUsername,
+        };
+      }
+
+      // ── VALIDATORS (return null on pass, error string on fail) ──
+      function validateCustomer(data, editId) {
+        if (!data.name) return "Customer name is required.";
+        if (!data.email) return "Email address is required.";
+        var emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRe.test(data.email))
+          return "Please enter a valid email address.";
+        var dup = (customers || []).find(function (c) {
+          return (
+            c &&
+            c.email.toLowerCase() === data.email.toLowerCase() &&
+            c.id !== editId
+          );
+        });
+        if (dup)
+          return (
+            "A customer with this email already exists (" + dup.name + ")."
+          );
+        return null;
+      }
+
+      function validateInvoice(data) {
+        if (!data.customerId) return "Please select a customer.";
+        var custExists = (customers || []).find(function (c) {
+          return c && c.id === data.customerId;
+        });
+        if (!custExists)
+          return "Selected customer no longer exists. Please choose another.";
+        if (!data.lineItems || data.lineItems.length === 0)
+          return "Add at least one line item.";
+        var hasDesc = data.lineItems.some(function (li) {
+          return li && li.description;
+        });
+        if (!hasDesc) return "At least one line item must have a description.";
+        if (data.total <= 0) return "Invoice total must be greater than $0.00.";
+        if (data.dueDate && data.issueDate && data.dueDate < data.issueDate)
+          return "Due date cannot be before the issue date.";
+        return null;
+      }
+
+      function validateRepair(data) {
+        if (!data.customerId) return "Please select a customer.";
+        var custExists = (customers || []).find(function (c) {
+          return c && c.id === data.customerId;
+        });
+        if (!custExists) return "Selected customer no longer exists.";
+        if (!data.deviceType) return "Device type is required.";
+        if (!data.issue) return "Issue description is required.";
+        if (data.estimatedCost < 0) return "Estimated cost cannot be negative.";
+        if (
+          data.estimatedCompletion &&
+          data.receivedDate &&
+          data.estimatedCompletion < data.receivedDate
+        )
+          return "Estimated completion date cannot be before the received date.";
+        return null;
+      }
+
+      function validatePart(data) {
+        if (!data.partName) return "Part name is required.";
+        if (data.qty < 1) return "Quantity must be at least 1.";
+        if (data.unitCost < 0) return "Unit cost cannot be negative.";
+        if (
+          data.expectedDate &&
+          data.orderedDate &&
+          data.expectedDate < data.orderedDate
+        )
+          return "Expected date cannot be before the ordered date.";
+        return null;
+      }
+
+      // ── SAMPLE DATA ──
+      function generateSampleData() {
+        customers = [
+          {
+            id: "c1",
+            name: "Sarah Johnson",
+            email: "sarah@acmecorp.com",
+            phone: "(555) 234-5678",
+            company: "Acme Corp",
+            address: "123 Business Ave, Suite 400\nNew York, NY 10001",
+            notes: "Preferred client — 10% discount on all services.",
+            createdAt: "2026-04-12",
+          },
+          {
+            id: "c2",
+            name: "Marcus Chen",
+            email: "m.chen@brightwave.io",
+            phone: "(555) 876-5432",
+            company: "BrightWave LLC",
+            address: "456 Innovation Blvd\nSan Francisco, CA 94105",
+            notes: "Net 15 payment terms agreed.",
+            createdAt: "2026-04-20",
+          },
+          {
+            id: "c3",
+            name: "Priya Patel",
+            email: "priya@designhaus.co",
+            phone: "(555) 112-9988",
+            company: "DesignHaus Studio",
+            address: "789 Creative Lane\nAustin, TX 78701",
+            notes: "",
+            createdAt: "2026-05-02",
+          },
+        ];
+        invoices = [
+          {
+            id: "i1",
+            invoiceNumber: "INV-0001",
+            customerId: "c1",
+            status: "paid",
+            issueDate: "2026-05-01",
+            dueDate: "2026-05-31",
+            lineItems: [
+              {
+                description: "Website Redesign — Full-stack development",
+                qty: 1,
+                unitPrice: 4500,
+                taxPct: 0,
+                lineTotal: 4500,
+              },
+              {
+                description: "SEO Audit & Optimization",
+                qty: 1,
+                unitPrice: 800,
+                taxPct: 0,
+                lineTotal: 800,
+              },
+            ],
+            subtotal: 5300,
+            taxTotal: 0,
+            total: 5300,
+            notes: "Thank you for your prompt payment!",
+            paymentTerms: "Payment due within 30 days",
+            paypalEmail: "",
+            paypalLink: "",
+            createdAt: "2026-05-01",
+            updatedAt: "2026-05-10",
+          },
+          {
+            id: "i2",
+            invoiceNumber: "INV-0002",
+            customerId: "c2",
+            status: "sent",
+            issueDate: "2026-05-10",
+            dueDate: "2026-06-09",
+            lineItems: [
+              {
+                description: "UI/UX Consulting — 20 hours",
+                qty: 20,
+                unitPrice: 150,
+                taxPct: 8,
+                lineTotal: 3000,
+              },
+              {
+                description: "Prototype Development",
+                qty: 1,
+                unitPrice: 2200,
+                taxPct: 8,
+                lineTotal: 2200,
+              },
+            ],
+            subtotal: 5200,
+            taxTotal: 416,
+            total: 5616,
+            notes: "Includes interactive prototype in Figma.",
+            paymentTerms: "Net 15",
+            paypalEmail: "",
+            paypalLink: "",
+            createdAt: "2026-05-10",
+            updatedAt: "2026-05-10",
+          },
+          {
+            id: "i3",
+            invoiceNumber: "INV-0003",
+            customerId: "c3",
+            status: "overdue",
+            issueDate: "2026-04-15",
+            dueDate: "2026-05-15",
+            lineItems: [
+              {
+                description: "Brand Identity Package",
+                qty: 1,
+                unitPrice: 3200,
+                taxPct: 0,
+                lineTotal: 3200,
+              },
+              {
+                description: "Business Card Design",
+                qty: 1,
+                unitPrice: 350,
+                taxPct: 0,
+                lineTotal: 350,
+              },
+              {
+                description: "Social Media Kit",
+                qty: 1,
+                unitPrice: 750,
+                taxPct: 0,
+                lineTotal: 750,
+              },
+            ],
+            subtotal: 4300,
+            taxTotal: 0,
+            total: 4300,
+            notes: "Please remit payment at your earliest convenience.",
+            paymentTerms: "Payment due within 30 days",
+            paypalEmail: "",
+            paypalLink: "",
+            createdAt: "2026-04-15",
+            updatedAt: "2026-04-15",
+          },
+          {
+            id: "i4",
+            invoiceNumber: "INV-0004",
+            customerId: "c1",
+            status: "draft",
+            issueDate: "2026-05-28",
+            dueDate: "2026-06-27",
+            lineItems: [
+              {
+                description: "Monthly Hosting & Maintenance",
+                qty: 1,
+                unitPrice: 250,
+                taxPct: 10,
+                lineTotal: 250,
+              },
+              {
+                description: "SSL Certificate Renewal",
+                qty: 1,
+                unitPrice: 75,
+                taxPct: 10,
+                lineTotal: 75,
+              },
+            ],
+            subtotal: 325,
+            taxTotal: 32.5,
+            total: 357.5,
+            notes: "",
+            paymentTerms: "Payment due within 30 days",
+            paypalEmail: "",
+            paypalLink: "",
+            createdAt: "2026-05-28",
+            updatedAt: "2026-05-28",
+          },
+        ];
+        invoiceCounter = 5;
+
+        repairs = [
+          {
+            id: "r1",
+            repairNumber: "REP-0001",
+            customerId: "c1",
+            invoiceId: "",
+            partIds: [],
+            deviceType: 'MacBook Pro 14"',
+            issue: "Screen replacement",
+            status: "in-progress",
+            receivedDate: todayStr(),
+            estimatedCompletion: plus30(),
+            techNotes: "Ordered replacement panel.",
+            estimatedCost: 320,
+            createdAt: todayStr(),
+          },
+          {
+            id: "r2",
+            repairNumber: "REP-0002",
+            customerId: "c2",
+            invoiceId: "",
+            partIds: [],
+            deviceType: "iPhone 15 Pro",
+            issue: "Battery replacement",
+            status: "completed",
+            receivedDate: todayStr(),
+            estimatedCompletion: todayStr(),
+            techNotes: "Battery replaced and tested.",
+            estimatedCost: 89,
+            createdAt: todayStr(),
+          },
+          {
+            id: "r3",
+            repairNumber: "REP-0003",
+            customerId: "c3",
+            invoiceId: "",
+            partIds: [],
+            deviceType: "Dell XPS 15",
+            issue: "Charging port repair",
+            status: "waiting-parts",
+            receivedDate: todayStr(),
+            estimatedCompletion: plus30(),
+            techNotes: "Awaiting USB-C board.",
+            estimatedCost: 145,
+            createdAt: todayStr(),
+          },
+        ];
+        repairCounter = 4;
+
+        parts = [
+          {
+            id: "p1",
+            repairId: "",
+            partName: 'MacBook Pro 14" Display Assembly',
+            partNumber: "MBPD-14-2023",
+            supplier: "iFixit Wholesale",
+            qty: 1,
+            unitCost: 280,
+            status: "ordered",
+            orderedDate: todayStr(),
+            expectedDate: plus30(),
+            notes: "For repair REP-0001",
+            createdAt: todayStr(),
+          },
+          {
+            id: "p2",
+            repairId: "",
+            partName: "iPhone 15 Pro Battery",
+            partNumber: "IPH15P-BAT",
+            supplier: "Mobile Parts USA",
+            qty: 3,
+            unitCost: 42,
+            status: "received",
+            orderedDate: todayStr(),
+            expectedDate: todayStr(),
+            notes: "Stock replenishment",
+            createdAt: todayStr(),
+          },
+          {
+            id: "p3",
+            repairId: "",
+            partName: "USB-C Charging Port Board (Dell XPS 15)",
+            partNumber: "DXPS15-USBC",
+            supplier: "LaptopParts Pro",
+            qty: 1,
+            unitCost: 95,
+            status: "in-transit",
+            orderedDate: todayStr(),
+            expectedDate: plus30(),
+            notes: "For repair REP-0003",
+            createdAt: todayStr(),
+          },
+        ];
+
+        settings = {
+          businessName: "",
+          businessEmail: "",
+          businessPhone: "",
+          businessAddress: "",
+          defaultTaxRate: 0,
+          defaultPaymentTerms: "Payment due within 30 days",
+          paypalUsername: "",
+        };
+
+        // Normalize all sample data through schemas
+        customers = customers.map(normalizeCustomer).filter(Boolean);
+        invoices = invoices.map(normalizeInvoice).filter(Boolean);
+        repairs = repairs.map(normalizeRepair).filter(Boolean);
+        parts = parts.map(normalizePart).filter(Boolean);
+        settings = normalizeSettings(settings);
+      }
+
+      // ── INIT ──
+      async function init() {
+        var rawCustomers = await Storage.get("customers", []);
+        var rawInvoices = await Storage.get("invoices", []);
+        var rawRepairs = await Storage.get("repairs", []);
+        var rawParts = await Storage.get("parts", []);
+        var rawSettings = await Storage.get("settings", {});
+        var rawInvCtr = await Storage.get("invoiceCounter", null);
+        var rawRepCtr = await Storage.get("repairCounter", null);
+
+        var hasExistingData =
+          Array.isArray(rawCustomers) && rawCustomers.length > 0;
+
+        if (hasExistingData) {
+          // Sanitize every entry through its normalizer, drop null results
+          customers = rawCustomers.map(normalizeCustomer).filter(Boolean);
+          invoices = rawInvoices.map(normalizeInvoice).filter(Boolean);
+          repairs = rawRepairs.map(normalizeRepair).filter(Boolean);
+          parts = rawParts.map(normalizePart).filter(Boolean);
+          settings = normalizeSettings(rawSettings);
+          // Fix null/NaN counters — derive from existing data if needed
+          invoiceCounter =
+            rawInvCtr != null && !isNaN(parseInt(rawInvCtr))
+              ? parseInt(rawInvCtr)
+              : invoices.length > 0
+                ? Math.max.apply(
+                    null,
+                    invoices.map(function (i) {
+                      return (
+                        parseInt((i.invoiceNumber || "0").replace(/\D/g, "")) ||
+                        0
+                      );
+                    }),
+                  ) + 1
+                : 1;
+          repairCounter =
+            rawRepCtr != null && !isNaN(parseInt(rawRepCtr))
+              ? parseInt(rawRepCtr)
+              : repairs.length > 0
+                ? Math.max.apply(
+                    null,
+                    repairs.map(function (r) {
+                      return (
+                        parseInt((r.repairNumber || "0").replace(/\D/g, "")) ||
+                        0
+                      );
+                    }),
+                  ) + 1
+                : 1;
+        } else {
+          generateSampleData();
+          await saveAll();
+        }
+        renderView(currentView);
+        setupNav();
+        setupMobileMenu();
+      }
+
+      async function saveAll() {
+        await Storage.set("customers", customers);
+        await Storage.set("invoices", invoices);
+        await Storage.set("repairs", repairs);
+        await Storage.set("parts", parts);
+        await Storage.set("settings", settings);
+        await Storage.set("invoiceCounter", invoiceCounter);
+        await Storage.set("repairCounter", repairCounter);
+      }
+
+      // ── TOAST ──
+      function showToast(msg, type) {
+        type = type || "success";
+        const tc = document.getElementById("toast-container-t1c2");
+        if (!tc) return;
+        const t = document.createElement("div");
+        t.className = "toast toast-" + type;
+        t.innerHTML =
+          '<i data-lucide="' +
+          (type === "success" ? "check-circle" : "alert-circle") +
+          '" class="w-5 h-5"></i> ' +
+          msg;
+        tc.appendChild(t);
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        setTimeout(function () {
+          t.style.opacity = "0";
+          t.style.transition = "opacity 0.3s";
+          setTimeout(function () {
+            t.remove();
+          }, 300);
+        }, 3000);
+      }
+
+      // ── MODAL ──
+      function openModal(html, size) {
+        size = size || "sm";
+        const mc = document.getElementById("modal-container-m1c2");
+        if (!mc) return;
+        mc.innerHTML =
+          '<div class="modal-overlay" id="modal-overlay-o1v2"><div class="modal-content modal-' +
+          size +
+          '">' +
+          html +
+          "</div></div>";
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        const overlay = document.getElementById("modal-overlay-o1v2");
+        if (overlay)
+          overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) closeModal();
+          });
+      }
+      function closeModal() {
+        const mc = document.getElementById("modal-container-m1c2");
+        if (mc) mc.innerHTML = "";
+      }
+
+      // ── NAV ──
+      function setupNav() {
+        document.querySelectorAll(".nav-item").forEach(function (item) {
+          item.addEventListener("click", function () {
+            currentView = item.dataset.view;
+            filterCustomerId = null;
+            document.querySelectorAll(".nav-item").forEach(function (i) {
+              i.classList.remove("active");
+            });
+            item.classList.add("active");
+            renderView(currentView);
+          });
+        });
+      }
+
+      function navigateToView(view) {
+        currentView = view;
+        filterCustomerId = null;
+        document.querySelectorAll(".nav-item").forEach(function (i) {
+          i.classList.remove("active");
+        });
+        var navItem = document.querySelector(
+          '.nav-item[data-view="' + view + '"]',
+        );
+        if (navItem) navItem.classList.add("active");
+        renderView(currentView);
+      }
+
+      function setupMobileMenu() {
+        var btn = document.getElementById("mobile-menu-btn-m1b2");
+        var sidebar = document.getElementById("sidebar-nav-s1k2");
+        if (!btn || !sidebar) return;
+        if (window.innerWidth < 1024) btn.style.display = "block";
+        window.addEventListener("resize", function () {
+          btn.style.display = window.innerWidth < 1024 ? "block" : "none";
+          if (window.innerWidth >= 1024) sidebar.classList.remove("open");
+        });
+        btn.addEventListener("click", function () {
+          sidebar.classList.toggle("open");
+        });
+      }
+
+      function setPageTitle(title) {
+        var el = document.getElementById("page-title-t3l1");
+        if (el) el.textContent = title;
+      }
+      function setHeaderActions(html) {
+        var el = document.getElementById("header-actions-a1c2");
+        if (el) el.innerHTML = html;
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+      }
+
+      // ── RENDER VIEW ──
+      function renderView(view) {
+        var content = document.getElementById("content-area-c1a2");
+        if (!content) return;
+        switch (view) {
+          case "dashboard":
+            renderDashboard(content);
+            break;
+          case "customers":
+            renderCustomers(content);
+            break;
+          case "invoices":
+            renderInvoices(content);
+            break;
+          case "payments":
+            renderPayments(content);
+            break;
+          case "repairs":
+            renderRepairs(content);
+            break;
+          case "parts":
+            renderParts(content);
+            break;
+          case "settings":
+            renderSettings(content);
+            break;
+          case "invoice-form":
+            renderInvoiceForm(content);
+            break;
+          case "invoice-detail":
+            renderInvoiceDetail(content);
+            break;
+          default:
+            console.warn("[CustomerPortal] Unknown view:", view);
+            el_innerHTML_safe(
+              content,
+              '<div class="stat-card"><div class="empty-state"><i data-lucide="alert-triangle" class="w-12 h-12" style="color:#f59e0b;"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">Page not found</p><p style="font-size:14px;">The requested section does not exist. Use the sidebar to navigate.</p></div></div>',
+            );
+            if (
+              typeof lucide !== "undefined" &&
+              typeof lucide.createIcons === "function"
+            )
+              lucide.createIcons();
+            break;
+        }
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+      }
+
+      function el_innerHTML_safe(el, html) {
+        if (el) el.innerHTML = html;
+      }
+
+      // ── HELPERS ──
+      function getCustomerName(cid) {
+        if (!cid || !Array.isArray(customers)) return "Unknown";
+        var c = customers.find(function (x) {
+          return x && x.id === cid;
+        });
+        return c ? c.name || "Unnamed" : "Unknown";
+      }
+      function getCustomer(cid) {
+        if (!cid || !Array.isArray(customers)) return null;
+        return (
+          customers.find(function (x) {
+            return x && x.id === cid;
+          }) || null
+        );
+      }
+      function statusBadge(s) {
+        var map = {
+          draft: "badge-draft",
+          sent: "badge-sent",
+          paid: "badge-paid",
+          overdue: "badge-overdue",
+        };
+        return (
+          '<span class="badge ' +
+          (map[s] || "badge-draft") +
+          '">' +
+          s.charAt(0).toUpperCase() +
+          s.slice(1) +
+          "</span>"
+        );
+      }
+      function repairStatusBadge(s) {
+        var map = {
+          "in-progress": "badge-in-progress",
+          completed: "badge-completed",
+          "waiting-parts": "badge-waiting-parts",
+          pending: "badge-pending",
+        };
+        var labels = {
+          "in-progress": "In Progress",
+          completed: "Completed",
+          "waiting-parts": "Waiting Parts",
+          pending: "Pending",
+        };
+        return (
+          '<span class="badge ' +
+          (map[s] || "badge-pending") +
+          '">' +
+          (labels[s] || s) +
+          "</span>"
+        );
+      }
+      function partStatusBadge(s) {
+        var map = {
+          ordered: "badge-ordered",
+          "in-transit": "badge-in-transit",
+          received: "badge-received",
+          cancelled: "badge-cancelled",
+        };
+        var labels = {
+          ordered: "Ordered",
+          "in-transit": "In Transit",
+          received: "Received",
+          cancelled: "Cancelled",
+        };
+        return (
+          '<span class="badge ' +
+          (map[s] || "badge-ordered") +
+          '">' +
+          (labels[s] || s) +
+          "</span>"
+        );
+      }
+      function customerInvoiceTotal(cid) {
+        return (invoices || [])
+          .filter(function (i) {
+            return i && i.customerId === cid;
+          })
+          .reduce(function (s, i) {
+            return s + (i.total || 0);
+          }, 0);
+      }
+      function customerInvoiceCount(cid) {
+        return (invoices || []).filter(function (i) {
+          return i && i.customerId === cid;
+        }).length;
+      }
+
+      // ══════════════════════════════
+      // ──  DASHBOARD VIEW
+      // ══════════════════════════════
+      function renderDashboard(el) {
+        setPageTitle("Dashboard");
+        setHeaderActions("");
+        var safeCustomers = customers || [];
+        var safeInvoices = invoices || [];
+        var safeRepairs = repairs || [];
+        var safeParts = parts || [];
+
+        var totalCustomers = safeCustomers.length;
+        var totalInvoices = safeInvoices.length;
+        var outstanding = safeInvoices
+          .filter(function (i) {
+            return i && i.status !== "paid";
+          })
+          .reduce(function (s, i) {
+            return s + (i.total || 0);
+          }, 0);
+        var now = new Date();
+        var paidThisMonth = safeInvoices
+          .filter(function (i) {
+            if (!i || i.status !== "paid") return false;
+            var d = new Date(i.issueDate + "T00:00:00");
+            return (
+              d.getMonth() === now.getMonth() &&
+              d.getFullYear() === now.getFullYear()
+            );
+          })
+          .reduce(function (s, i) {
+            return s + (i.total || 0);
+          }, 0);
+
+        var openRepairs = safeRepairs.filter(function (r) {
+          return r && r.status !== "completed";
+        }).length;
+        var partsOnOrder = safeParts.filter(function (p) {
+          return p && (p.status === "ordered" || p.status === "in-transit");
+        }).length;
+
+        var recentInv = []
+          .concat(safeInvoices)
+          .sort(function (a, b) {
+            return (b.createdAt || "").localeCompare(a.createdAt || "");
+          })
+          .slice(0, 5);
+        var recentCust = []
+          .concat(safeCustomers)
+          .sort(function (a, b) {
+            return (b.createdAt || "").localeCompare(a.createdAt || "");
+          })
+          .slice(0, 5);
+
+        el.innerHTML =
+          '\
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-bottom:20px;">\
+      <div class="stat-card-clickable" data-route="customers">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Total Customers</span>\
+          <i data-lucide="users" class="w-5 h-5" style="color:#818cf8;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          totalCustomers +
+          '</div>\
+      </div>\
+      <div class="stat-card-clickable" data-route="invoices">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Total Invoices</span>\
+          <i data-lucide="file-text" class="w-5 h-5" style="color:#818cf8;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          totalInvoices +
+          '</div>\
+      </div>\
+      <div class="stat-card-clickable" data-route="invoices-outstanding">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Outstanding</span>\
+          <i data-lucide="clock" class="w-5 h-5" style="color:#f59e0b;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          fmtMoney(outstanding) +
+          '</div>\
+      </div>\
+      <div class="stat-card-clickable" data-route="invoices-paid">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Paid This Month</span>\
+          <i data-lucide="check-circle" class="w-5 h-5" style="color:#22c55e;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          fmtMoney(paidThisMonth) +
+          '</div>\
+      </div>\
+    </div>\
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:32px;">\
+      <div class="stat-card-clickable" data-route="repairs">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Open Repairs</span>\
+          <i data-lucide="wrench" class="w-5 h-5" style="color:#f59e0b;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          openRepairs +
+          '</div>\
+      </div>\
+      <div class="stat-card-clickable" data-route="parts">\
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Parts on Order</span>\
+          <i data-lucide="package" class="w-5 h-5" style="color:#818cf8;"></i>\
+        </div>\
+        <div style="font-size:32px;font-weight:700;color:#0f172a;font-variant-numeric:tabular-nums;">' +
+          partsOnOrder +
+          '</div>\
+      </div>\
+    </div>\
+    <div style="display:grid;grid-template-columns:1fr;gap:24px;">\
+      <div class="stat-card">\
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 16px;">Recent Invoices</h3>\
+        ' +
+          (recentInv.length
+            ? '<div style="overflow-x:auto;"><table class="data-table">\
+          <thead><tr><th>Invoice #</th><th>Customer</th><th>Amount</th><th>Status</th><th>Date</th></tr></thead>\
+          <tbody>' +
+              recentInv
+                .map(function (i) {
+                  return (
+                    '<tr>\
+            <td style="font-weight:600;color:#4f46e5;cursor:pointer;" class="inv-link-dash" data-id="' +
+                    i.id +
+                    '">' +
+                    i.invoiceNumber +
+                    "</td>\
+            <td>" +
+                    getCustomerName(i.customerId) +
+                    '</td>\
+            <td style="font-variant-numeric:tabular-nums;">' +
+                    fmtMoney(i.total) +
+                    "</td>\
+            <td>" +
+                    statusBadge(i.status) +
+                    '</td>\
+            <td style="color:#64748b;">' +
+                    formatDate(i.issueDate) +
+                    "</td>\
+          </tr>"
+                  );
+                })
+                .join("") +
+              "</tbody>\
+        </table></div>"
+            : '<div class="empty-state"><i data-lucide="file-text" class="w-10 h-10"></i><p>No invoices yet</p></div>') +
+          '\
+      </div>\
+      <div class="stat-card">\
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 16px;">Recent Customers</h3>\
+        ' +
+          (recentCust.length
+            ? '<div style="overflow-x:auto;"><table class="data-table">\
+          <thead><tr><th>Name</th><th>Email</th><th>Company</th><th>Added</th></tr></thead>\
+          <tbody>' +
+              recentCust
+                .map(function (c) {
+                  return (
+                    '<tr>\
+            <td style="font-weight:600;">' +
+                    c.name +
+                    '</td>\
+            <td style="color:#64748b;">' +
+                    c.email +
+                    "</td>\
+            <td>" +
+                    (c.company || "—") +
+                    '</td>\
+            <td style="color:#64748b;">' +
+                    formatDate(c.createdAt) +
+                    "</td>\
+          </tr>"
+                  );
+                })
+                .join("") +
+              "</tbody>\
+        </table></div>"
+            : '<div class="empty-state"><i data-lucide="users" class="w-10 h-10"></i><p>No customers yet</p></div>') +
+          "\
+      </div>\
+    </div>";
+
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+
+        // Clickable stat cards
+        el.querySelectorAll(".stat-card-clickable").forEach(function (card) {
+          card.addEventListener("click", function () {
+            var route = card.dataset.route;
+            if (route === "invoices-outstanding") {
+              window._dashStatusFilter = "outstanding";
+              navigateToView("invoices");
+            } else if (route === "invoices-paid") {
+              window._dashStatusFilter = "paid";
+              navigateToView("invoices");
+            } else {
+              window._dashStatusFilter = null;
+              navigateToView(route);
+            }
+          });
+        });
+
+        el.querySelectorAll(".inv-link-dash").forEach(function (link) {
+          link.addEventListener("click", function () {
+            window._editInvoiceId = link.dataset.id;
+            currentView = "invoice-detail";
+            renderView("invoice-detail");
+          });
+        });
+      }
+
+      // ══════════════════════════════
+      // ──  CUSTOMERS VIEW
+      // ══════════════════════════════
+      function renderCustomers(el) {
+        setPageTitle("Customers");
+        setHeaderActions(
+          '<button class="btn-primary" id="add-cust-btn-a1b2"><i data-lucide="plus" class="w-4 h-4"></i> Add Customer</button>',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var addBtn = document.getElementById("add-cust-btn-a1b2");
+        if (addBtn)
+          addBtn.addEventListener("click", function () {
+            openCustomerModal();
+          });
+
+        var safeCustomers = customers || [];
+
+        if (safeCustomers.length === 0) {
+          el.innerHTML =
+            '<div class="stat-card"><div class="empty-state"><i data-lucide="users" class="w-12 h-12"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">No customers yet</p><p style="font-size:14px;">Add your first customer to get started.</p></div></div>';
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          return;
+        }
+
+        el.innerHTML =
+          '<div class="stat-card" style="padding:0;overflow:hidden;"><div style="overflow-x:auto;">\
+    <table class="data-table">\
+      <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Company</th><th style="text-align:right;">Total Invoiced</th><th style="text-align:center;"># Invoices</th><th style="text-align:right;">Actions</th></tr></thead>\
+      <tbody>' +
+          safeCustomers
+            .map(function (c) {
+              return (
+                '<tr>\
+        <td style="font-weight:600;">' +
+                c.name +
+                '</td>\
+        <td style="color:#64748b;">' +
+                c.email +
+                '</td>\
+        <td style="color:#64748b;">' +
+                (c.phone || "—") +
+                "</td>\
+        <td>" +
+                (c.company || "—") +
+                '</td>\
+        <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(customerInvoiceTotal(c.id)) +
+                '</td>\
+        <td style="text-align:center;font-variant-numeric:tabular-nums;">' +
+                customerInvoiceCount(c.id) +
+                '</td>\
+        <td style="text-align:right;">\
+          <div style="display:flex;gap:4px;justify-content:flex-end;">\
+            <button class="action-btn cust-view-inv" data-id="' +
+                c.id +
+                '" title="View Invoices"><i data-lucide="file-text" class="w-4 h-4"></i></button>\
+            <button class="action-btn cust-edit" data-id="' +
+                c.id +
+                '" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>\
+            <button class="action-btn cust-del" data-id="' +
+                c.id +
+                '" title="Delete" style="color:#dc2626;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>\
+          </div>\
+        </td>\
+      </tr>'
+              );
+            })
+            .join("") +
+          "</tbody>\
+    </table>\
+  </div></div>";
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        el.querySelectorAll(".cust-edit").forEach(function (b) {
+          b.addEventListener("click", function () {
+            openCustomerModal(b.dataset.id);
+          });
+        });
+        el.querySelectorAll(".cust-del").forEach(function (b) {
+          b.addEventListener("click", function () {
+            confirmDeleteCustomer(b.dataset.id);
+          });
+        });
+        el.querySelectorAll(".cust-view-inv").forEach(function (b) {
+          b.addEventListener("click", function () {
+            filterCustomerId = b.dataset.id;
+            currentView = "invoices";
+            document.querySelectorAll(".nav-item").forEach(function (i) {
+              i.classList.remove("active");
+            });
+            var navInv = document.querySelector(
+              '.nav-item[data-view="invoices"]',
+            );
+            if (navInv) navInv.classList.add("active");
+            renderView("invoices");
+          });
+        });
+      }
+
+      function openCustomerModal(editId) {
+        var c = editId
+          ? (customers || []).find(function (x) {
+              return x && x.id === editId;
+            })
+          : null;
+        var title = c ? "Edit Customer" : "Add Customer";
+        openModal(
+          '\
+    <div style="padding:28px;">\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 24px;">' +
+            title +
+            '</h2>\
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+        <div><label class="form-label">Full Name <span style="color:#ef4444;">*</span></label><input class="form-input" id="cf-name-n1m2" value="' +
+            (c ? c.name : "") +
+            '" placeholder="e.g. Sarah Johnson"></div>\
+        <div><label class="form-label">Email <span style="color:#ef4444;">*</span></label><input class="form-input" id="cf-email-e1m2" type="email" value="' +
+            (c ? c.email : "") +
+            '" placeholder="e.g. sarah@example.com"></div>\
+        <div><label class="form-label">Phone</label><input class="form-input" id="cf-phone-p1m2" value="' +
+            (c ? c.phone : "") +
+            '" placeholder="(555) 000-0000"></div>\
+        <div><label class="form-label">Company</label><input class="form-input" id="cf-company-c1m2" value="' +
+            (c ? c.company : "") +
+            '" placeholder="Company name"></div>\
+      </div>\
+      <div style="margin-top:16px;"><label class="form-label">Address</label><textarea class="form-input" id="cf-address-a1m2" placeholder="Street, City, State ZIP">' +
+            (c ? c.address : "") +
+            '</textarea></div>\
+      <div style="margin-top:16px;"><label class="form-label">Notes</label><textarea class="form-input" id="cf-notes-n2m2" placeholder="Internal notes...">' +
+            (c ? c.notes : "") +
+            '</textarea></div>\
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">\
+        <button class="btn-secondary" id="cf-cancel-c2m2">Cancel</button>\
+        <button class="btn-primary" id="cf-save-s1m2">Save Customer</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        var cancelBtn = document.getElementById("cf-cancel-c2m2");
+        if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+        var saveBtn = document.getElementById("cf-save-s1m2");
+        if (saveBtn)
+          saveBtn.addEventListener("click", async function () {
+            var nameEl = document.getElementById("cf-name-n1m2");
+            var emailEl = document.getElementById("cf-email-e1m2");
+            var name = nameEl ? nameEl.value.trim() : "";
+            var email = emailEl ? emailEl.value.trim() : "";
+            var data = {
+              name: name,
+              email: email,
+              phone: (
+                document.getElementById("cf-phone-p1m2") || { value: "" }
+              ).value.trim(),
+              company: (
+                document.getElementById("cf-company-c1m2") || { value: "" }
+              ).value.trim(),
+              address: (
+                document.getElementById("cf-address-a1m2") || { value: "" }
+              ).value.trim(),
+              notes: (
+                document.getElementById("cf-notes-n2m2") || { value: "" }
+              ).value.trim(),
+            };
+            var custErr = validateCustomer(data, c ? c.id : null);
+            if (custErr) {
+              if (!data.name && nameEl) nameEl.classList.add("error");
+              if (!data.email && emailEl) emailEl.classList.add("error");
+              showToast(custErr, "error");
+              return;
+            }
+            var now = todayStr();
+            if (c) {
+              Object.assign(
+                c,
+                normalizeCustomer(
+                  Object.assign({}, c, data, { updatedAt: now }),
+                ),
+              );
+              showToast("Customer updated successfully.");
+            } else {
+              if (Array.isArray(customers)) {
+                customers.push(
+                  normalizeCustomer(
+                    Object.assign(
+                      { id: uid(), createdAt: now, updatedAt: now },
+                      data,
+                    ),
+                  ),
+                );
+              }
+              showToast("Customer added successfully.");
+            }
+            await saveAll();
+            closeModal();
+            renderView("customers");
+          });
+      }
+
+      function confirmDeleteCustomer(id) {
+        var c = (customers || []).find(function (x) {
+          return x && x.id === id;
+        });
+        if (!c) return;
+        var invCount = customerInvoiceCount(id);
+        var repairCount = (repairs || []).filter(function (r) {
+          return r && r.customerId === id;
+        }).length;
+        var warnParts = [];
+        if (invCount > 0) warnParts.push(invCount + " invoice(s)");
+        if (repairCount > 0) warnParts.push(repairCount + " repair(s)");
+        var warn =
+          warnParts.length > 0
+            ? '<p style="color:#dc2626;font-size:13px;margin-top:8px;">⚠️ This customer has ' +
+              warnParts.join(" and ") +
+              " that will be orphaned.</p>"
+            : "";
+        openModal(
+          '\
+    <div style="padding:28px;text-align:center;">\
+      <i data-lucide="alert-triangle" class="w-12 h-12" style="color:#f59e0b;margin:0 auto 16px;display:block;"></i>\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">Delete Customer?</h2>\
+      <p style="color:#64748b;font-size:14px;">Are you sure you want to delete <strong>' +
+            c.name +
+            "</strong>?</p>\
+      " +
+            warn +
+            '\
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">\
+        <button class="btn-secondary" id="del-c-cancel">Cancel</button>\
+        <button class="btn-primary" id="del-c-confirm" style="background:#ef4444;">Delete</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var delCancel = document.getElementById("del-c-cancel");
+        if (delCancel) delCancel.addEventListener("click", closeModal);
+        var delConfirm = document.getElementById("del-c-confirm");
+        if (delConfirm)
+          delConfirm.addEventListener("click", async function () {
+            customers = (customers || []).filter(function (x) {
+              return x && x.id !== id;
+            });
+            await saveAll();
+            closeModal();
+            showToast("Customer deleted.");
+            renderView("customers");
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  INVOICES VIEW
+      // ══════════════════════════════
+      function renderInvoices(el) {
+        var filteredCustName = filterCustomerId
+          ? getCustomerName(filterCustomerId)
+          : null;
+        setPageTitle(
+          filteredCustName ? "Invoices — " + filteredCustName : "Invoices",
+        );
+        setHeaderActions(
+          "\
+    " +
+            (filterCustomerId
+              ? '<button class="btn-secondary" id="clear-filter-btn" style="margin-right:8px;"><i data-lucide="x" class="w-4 h-4"></i> Clear Filter</button>'
+              : "") +
+            '\
+    <button class="btn-primary" id="create-inv-btn-c1b2"><i data-lucide="plus" class="w-4 h-4"></i> Create Invoice</button>\
+  ',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var createBtn = document.getElementById("create-inv-btn-c1b2");
+        if (createBtn)
+          createBtn.addEventListener("click", function () {
+            window._editInvoiceId = null;
+            currentView = "invoice-form";
+            renderView("invoice-form");
+          });
+        var cfBtn = document.getElementById("clear-filter-btn");
+        if (cfBtn)
+          cfBtn.addEventListener("click", function () {
+            filterCustomerId = null;
+            renderView("invoices");
+          });
+
+        var filtered = filterCustomerId
+          ? (invoices || []).filter(function (i) {
+              return i && i.customerId === filterCustomerId;
+            })
+          : [].concat(invoices || []);
+
+        // Check for dashboard status filter
+        var dashFilter = window._dashStatusFilter || null;
+        window._dashStatusFilter = null;
+
+        el.innerHTML =
+          '\
+    <div class="stat-card" style="margin-bottom:20px;padding:16px 20px;">\
+      <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">\
+        <div style="flex:1;min-width:200px;">\
+          <input class="form-input" id="inv-search-s1f2" placeholder="Search by invoice # or customer..." style="height:40px;">\
+        </div>\
+        <div>\
+          <select class="form-input" id="inv-status-filter-f1s2" style="height:40px;width:160px;">\
+            <option value="all">All Statuses</option>\
+            <option value="draft">Draft</option>\
+            <option value="sent">Sent</option>\
+            <option value="paid">Paid</option>\
+            <option value="overdue">Overdue</option>\
+          </select>\
+        </div>\
+        <div style="display:flex;gap:8px;align-items:center;">\
+          <input type="date" class="form-input" id="inv-date-from-d1f2" style="height:40px;width:160px;" placeholder="From">\
+          <span style="color:#94a3b8;">to</span>\
+          <input type="date" class="form-input" id="inv-date-to-d2f2" style="height:40px;width:160px;" placeholder="To">\
+        </div>\
+      </div>\
+    </div>\
+    <div class="stat-card" style="padding:0;overflow:hidden;" id="inv-table-wrap-w1t2"></div>\
+  ';
+
+        // Apply dashboard filter if set
+        if (dashFilter === "paid") {
+          var statusEl = document.getElementById("inv-status-filter-f1s2");
+          if (statusEl) statusEl.value = "paid";
+        }
+
+        function renderFilteredTable() {
+          var searchEl = document.getElementById("inv-search-s1f2");
+          var statusFEl = document.getElementById("inv-status-filter-f1s2");
+          var dateFromEl = document.getElementById("inv-date-from-d1f2");
+          var dateToEl = document.getElementById("inv-date-to-d2f2");
+          var q = searchEl ? searchEl.value.toLowerCase() : "";
+          var statusF = statusFEl ? statusFEl.value : "all";
+          var dateFrom = dateFromEl ? dateFromEl.value : "";
+          var dateTo = dateToEl ? dateToEl.value : "";
+          var list = (filtered || []).slice();
+          if (q)
+            list = list.filter(function (i) {
+              return (
+                i &&
+                (i.invoiceNumber.toLowerCase().includes(q) ||
+                  getCustomerName(i.customerId).toLowerCase().includes(q))
+              );
+            });
+          if (statusF !== "all")
+            list = list.filter(function (i) {
+              return i && i.status === statusF;
+            });
+          // Handle outstanding filter from dashboard
+          if (dashFilter === "outstanding" && statusF === "all") {
+            list = list.filter(function (i) {
+              return i && i.status !== "paid";
+            });
+          }
+          if (dateFrom)
+            list = list.filter(function (i) {
+              return i && i.issueDate >= dateFrom;
+            });
+          if (dateTo)
+            list = list.filter(function (i) {
+              return i && i.issueDate <= dateTo;
+            });
+          list.sort(function (a, b) {
+            return ((b && b.createdAt) || "").localeCompare(
+              (a && a.createdAt) || "",
+            );
+          });
+          var wrap = document.getElementById("inv-table-wrap-w1t2");
+          if (!wrap) return;
+          if (list.length === 0) {
+            wrap.innerHTML =
+              '<div class="empty-state"><i data-lucide="file-text" class="w-12 h-12"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">No invoices found</p><p style="font-size:14px;">Try adjusting your filters or create a new invoice.</p></div>';
+            if (
+              typeof lucide !== "undefined" &&
+              typeof lucide.createIcons === "function"
+            )
+              lucide.createIcons();
+            return;
+          }
+          wrap.innerHTML =
+            '<div style="overflow-x:auto;"><table class="data-table">\
+      <thead><tr><th>Invoice #</th><th>Customer</th><th>Issue Date</th><th>Due Date</th><th style="text-align:right;">Amount</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>\
+      <tbody>' +
+            list
+              .map(function (i) {
+                return (
+                  '<tr>\
+        <td style="font-weight:600;color:#4f46e5;cursor:pointer;" class="inv-view-link" data-id="' +
+                  i.id +
+                  '">' +
+                  i.invoiceNumber +
+                  "</td>\
+        <td>" +
+                  getCustomerName(i.customerId) +
+                  '</td>\
+        <td style="color:#64748b;">' +
+                  formatDate(i.issueDate) +
+                  '</td>\
+        <td style="color:#64748b;">' +
+                  formatDate(i.dueDate) +
+                  '</td>\
+        <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+                  fmtMoney(i.total) +
+                  "</td>\
+        <td>" +
+                  statusBadge(i.status) +
+                  '</td>\
+        <td style="text-align:right;">\
+          <div style="display:flex;gap:4px;justify-content:flex-end;">\
+            <button class="action-btn inv-view" data-id="' +
+                  i.id +
+                  '" title="View"><i data-lucide="eye" class="w-4 h-4"></i></button>\
+            <button class="action-btn inv-edit" data-id="' +
+                  i.id +
+                  '" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>\
+            <button class="action-btn inv-paylink" data-id="' +
+                  i.id +
+                  '" title="Pay Link" style="color:#6366f1;"><i data-lucide="credit-card" class="w-4 h-4"></i></button>\
+            <button class="action-btn inv-del" data-id="' +
+                  i.id +
+                  '" title="Delete" style="color:#dc2626;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>\
+          </div>\
+        </td>\
+      </tr>'
+                );
+              })
+              .join("") +
+            "</tbody>\
+    </table></div>";
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          wrap
+            .querySelectorAll(".inv-view-link, .inv-view")
+            .forEach(function (b) {
+              b.addEventListener("click", function () {
+                window._editInvoiceId = b.dataset.id;
+                currentView = "invoice-detail";
+                renderView("invoice-detail");
+              });
+            });
+          wrap.querySelectorAll(".inv-edit").forEach(function (b) {
+            b.addEventListener("click", function () {
+              window._editInvoiceId = b.dataset.id;
+              currentView = "invoice-form";
+              renderView("invoice-form");
+            });
+          });
+          wrap.querySelectorAll(".inv-del").forEach(function (b) {
+            b.addEventListener("click", function () {
+              confirmDeleteInvoice(b.dataset.id);
+            });
+          });
+          wrap.querySelectorAll(".inv-paylink").forEach(function (b) {
+            b.addEventListener("click", function () {
+              openPayLinkModal(b.dataset.id);
+            });
+          });
+        }
+
+        renderFilteredTable();
+        var searchInp = document.getElementById("inv-search-s1f2");
+        if (searchInp) searchInp.addEventListener("input", renderFilteredTable);
+        var statusInp = document.getElementById("inv-status-filter-f1s2");
+        if (statusInp)
+          statusInp.addEventListener("change", function () {
+            dashFilter = null;
+            renderFilteredTable();
+          });
+        var dateFromInp = document.getElementById("inv-date-from-d1f2");
+        if (dateFromInp)
+          dateFromInp.addEventListener("change", renderFilteredTable);
+        var dateToInp = document.getElementById("inv-date-to-d2f2");
+        if (dateToInp)
+          dateToInp.addEventListener("change", renderFilteredTable);
+      }
+
+      function confirmDeleteInvoice(id) {
+        var inv = (invoices || []).find(function (x) {
+          return x && x.id === id;
+        });
+        if (!inv) return;
+        openModal(
+          '\
+    <div style="padding:28px;text-align:center;">\
+      <i data-lucide="alert-triangle" class="w-12 h-12" style="color:#f59e0b;margin:0 auto 16px;display:block;"></i>\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">Delete Invoice?</h2>\
+      <p style="color:#64748b;font-size:14px;">Are you sure you want to delete <strong>' +
+            inv.invoiceNumber +
+            '</strong>?</p>\
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">\
+        <button class="btn-secondary" id="del-i-cancel">Cancel</button>\
+        <button class="btn-primary" id="del-i-confirm" style="background:#ef4444;">Delete</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var delCancel = document.getElementById("del-i-cancel");
+        if (delCancel) delCancel.addEventListener("click", closeModal);
+        var delConfirm = document.getElementById("del-i-confirm");
+        if (delConfirm)
+          delConfirm.addEventListener("click", async function () {
+            invoices = (invoices || []).filter(function (x) {
+              return x && x.id !== id;
+            });
+            await saveAll();
+            closeModal();
+            showToast("Invoice deleted.");
+            renderView("invoices");
+          });
+      }
+
+      function openPayLinkModal(id) {
+        var inv = (invoices || []).find(function (x) {
+          return x && x.id === id;
+        });
+        if (!inv) return;
+        var existingLink = inv.paypalLink || "";
+        openModal(
+          '\
+    <div style="padding:28px;">\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">Generate PayPal Payment Link</h2>\
+      <p style="color:#64748b;font-size:14px;margin-bottom:20px;">' +
+            inv.invoiceNumber +
+            " — " +
+            fmtMoney(inv.total) +
+            '</p>\
+      <label class="form-label">PayPal Email or Username</label>\
+      <input class="form-input" id="pp-email-p1m2" value="' +
+            (inv.paypalEmail || settings.paypalUsername || "") +
+            '" placeholder="your@paypal.com or username">\
+      <div id="pp-result-r1m2">' +
+            (existingLink
+              ? '<div class="paypal-link-box" style="margin-top:16px;"><a href="' +
+                existingLink +
+                '" target="_blank">' +
+                existingLink +
+                '</a><button class="btn-secondary btn-sm" id="pp-copy-existing" style="white-space:nowrap;">Copy</button></div>'
+              : "") +
+            '</div>\
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:20px;">\
+        <button class="btn-secondary" id="pp-cancel">Cancel</button>\
+        <button class="btn-primary" id="pp-generate">Generate Link</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        var copyExisting = document.getElementById("pp-copy-existing");
+        if (copyExisting)
+          copyExisting.addEventListener("click", function () {
+            navigator.clipboard.writeText(existingLink);
+            showToast("Link copied to clipboard!");
+          });
+        var ppCancel = document.getElementById("pp-cancel");
+        if (ppCancel) ppCancel.addEventListener("click", closeModal);
+        var ppGenerate = document.getElementById("pp-generate");
+        if (ppGenerate)
+          ppGenerate.addEventListener("click", async function () {
+            var valEl = document.getElementById("pp-email-p1m2");
+            var val = valEl ? valEl.value.trim() : "";
+            if (!val) {
+              showToast("Please enter a PayPal email or username.", "error");
+              return;
+            }
+            var username = val.includes("@") ? val.split("@")[0] : val;
+            var link =
+              "https://www.paypal.com/paypalme/" +
+              username +
+              "/" +
+              inv.total.toFixed(2);
+            inv.paypalEmail = val;
+            inv.paypalLink = link;
+            await saveAll();
+            var resultEl = document.getElementById("pp-result-r1m2");
+            if (resultEl)
+              resultEl.innerHTML =
+                '<div class="paypal-link-box"><a href="' +
+                link +
+                '" target="_blank">' +
+                link +
+                '</a><button class="btn-secondary btn-sm" id="pp-copy-new" style="white-space:nowrap;">Copy</button></div>';
+            var copyNew = document.getElementById("pp-copy-new");
+            if (copyNew)
+              copyNew.addEventListener("click", function () {
+                navigator.clipboard.writeText(link);
+                showToast("Link copied to clipboard!");
+              });
+            showToast("PayPal link generated!");
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  INVOICE FORM (FIX 1 — no full re-render on line item changes)
+      // ══════════════════════════════
+      function renderInvoiceForm(el) {
+        var editId = window._editInvoiceId;
+        var existing = editId
+          ? (invoices || []).find(function (x) {
+              return x && x.id === editId;
+            })
+          : null;
+        if (editId && !existing) {
+          showToast("Invoice not found, starting a new one.", "error");
+          window._editInvoiceId = null;
+          editId = null;
+        }
+        var isEdit = !!existing;
+        var invNum = isEdit ? existing.invoiceNumber : padInv(invoiceCounter);
+        setPageTitle(isEdit ? "Edit Invoice" : "Create Invoice");
+        setHeaderActions(
+          '<button class="btn-secondary" id="inv-back-btn"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Invoices</button>',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var backBtn = document.getElementById("inv-back-btn");
+        if (backBtn)
+          backBtn.addEventListener("click", function () {
+            currentView = "invoices";
+            renderView("invoices");
+          });
+
+        var lineItems = isEdit
+          ? JSON.parse(JSON.stringify(existing.lineItems || []))
+          : [
+              {
+                description: "",
+                qty: 1,
+                unitPrice: 0,
+                taxPct: settings.defaultTaxRate || 0,
+                lineTotal: 0,
+              },
+            ];
+
+        function calcTotals() {
+          var subtotal = 0,
+            taxTotal = 0;
+          lineItems.forEach(function (li) {
+            li.lineTotal = (li.qty || 0) * (li.unitPrice || 0);
+            subtotal += li.lineTotal;
+            taxTotal += li.lineTotal * ((li.taxPct || 0) / 100);
+          });
+          return {
+            subtotal: subtotal,
+            taxTotal: taxTotal,
+            total: subtotal + taxTotal,
+          };
+        }
+
+        function refreshTotals() {
+          calcTotals();
+          lineItems.forEach(function (li, idx) {
+            var cell = el.querySelector(
+              '.li-total-cell[data-idx="' + idx + '"]',
+            );
+            if (cell) cell.textContent = fmtMoney(li.lineTotal);
+          });
+          var t = calcTotals();
+          var sv = document.getElementById("if-subtotal-val");
+          if (sv) sv.textContent = fmtMoney(t.subtotal);
+          var tv = document.getElementById("if-tax-val");
+          if (tv) tv.textContent = fmtMoney(t.taxTotal);
+          var gv = document.getElementById("if-total-val");
+          if (gv) gv.textContent = fmtMoney(t.total);
+        }
+
+        function buildRowHTML(li, idx) {
+          return (
+            '<tr class="li-row" data-idx="' +
+            idx +
+            '">' +
+            '<td><input class="form-input li-desc" data-idx="' +
+            idx +
+            '" value="' +
+            (li.description || "").replace(/"/g, "&quot;") +
+            '" placeholder="Description" style="padding:8px 10px;"></td>' +
+            '<td><input class="form-input li-qty" data-idx="' +
+            idx +
+            '" type="number" min="0" step="1" value="' +
+            (li.qty || 0) +
+            '" style="padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums;"></td>' +
+            '<td><input class="form-input li-price" data-idx="' +
+            idx +
+            '" type="number" min="0" step="0.01" value="' +
+            (li.unitPrice || 0) +
+            '" style="padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums;"></td>' +
+            '<td><input class="form-input li-tax" data-idx="' +
+            idx +
+            '" type="number" min="0" step="0.5" value="' +
+            (li.taxPct || 0) +
+            '" style="padding:8px 10px;text-align:right;font-variant-numeric:tabular-nums;"></td>' +
+            '<td class="li-total-cell" data-idx="' +
+            idx +
+            '" style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;padding-right:16px;">' +
+            fmtMoney(li.lineTotal) +
+            "</td>" +
+            '<td><button class="action-btn li-remove" data-idx="' +
+            idx +
+            '" style="color:#dc2626;" title="Remove"><i data-lucide="x" class="w-4 h-4"></i></button></td>' +
+            "</tr>"
+          );
+        }
+
+        function wireRowEvents(row) {
+          var idx = parseInt(row.dataset.idx);
+          var descEl = row.querySelector(".li-desc");
+          var qtyEl = row.querySelector(".li-qty");
+          var priceEl = row.querySelector(".li-price");
+          var taxEl2 = row.querySelector(".li-tax");
+          var removeBtn = row.querySelector(".li-remove");
+          if (descEl)
+            descEl.addEventListener("input", function () {
+              lineItems[idx].description = descEl.value;
+            });
+          if (qtyEl)
+            qtyEl.addEventListener("input", function () {
+              lineItems[idx].qty = parseFloat(qtyEl.value) || 0;
+              refreshTotals();
+            });
+          if (priceEl)
+            priceEl.addEventListener("input", function () {
+              lineItems[idx].unitPrice = parseFloat(priceEl.value) || 0;
+              refreshTotals();
+            });
+          if (taxEl2)
+            taxEl2.addEventListener("input", function () {
+              lineItems[idx].taxPct = parseFloat(taxEl2.value) || 0;
+              refreshTotals();
+            });
+          if (removeBtn)
+            removeBtn.addEventListener("click", function () {
+              if (lineItems.length <= 1) return;
+              lineItems.splice(idx, 1);
+              rebuildLineItemsTable();
+            });
+        }
+
+        function rebuildLineItemsTable() {
+          var tbody = el.querySelector("#li-table-t1l2 tbody");
+          if (!tbody) return;
+          tbody.innerHTML = lineItems.map(buildRowHTML).join("");
+          tbody.querySelectorAll(".li-row").forEach(wireRowEvents);
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          refreshTotals();
+        }
+
+        var initTotals = calcTotals();
+        var safeCustomers = customers || [];
+
+        el.innerHTML =
+          "" +
+          '<div class="stat-card" style="margin-bottom:20px;">' +
+          '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;">' +
+          '<div><label class="form-label">Invoice #</label><input class="form-input" value="' +
+          invNum +
+          '" readonly style="background:#f1f5f9;color:#64748b;"></div>' +
+          '<div><label class="form-label">Status</label><select class="form-input" id="if-status-s1f2">' +
+          '<option value="draft"' +
+          ((existing ? existing.status : "draft") === "draft"
+            ? " selected"
+            : "") +
+          ">Draft</option>" +
+          '<option value="sent"' +
+          (existing && existing.status === "sent" ? " selected" : "") +
+          ">Sent</option>" +
+          '<option value="paid"' +
+          (existing && existing.status === "paid" ? " selected" : "") +
+          ">Paid</option>" +
+          '<option value="overdue"' +
+          (existing && existing.status === "overdue" ? " selected" : "") +
+          ">Overdue</option>" +
+          "</select></div>" +
+          '<div><label class="form-label">Customer <span style="color:#ef4444;">*</span></label>' +
+          '<div style="display:flex;gap:8px;">' +
+          '<select class="form-input" id="if-customer-c1f2" style="flex:1;">' +
+          '<option value="">Select customer...</option>' +
+          safeCustomers
+            .map(function (c) {
+              return (
+                '<option value="' +
+                c.id +
+                '"' +
+                (existing && existing.customerId === c.id ? " selected" : "") +
+                ">" +
+                c.name +
+                " \u2014 " +
+                (c.company || c.email) +
+                "</option>"
+              );
+            })
+            .join("") +
+          "</select>" +
+          '<button class="btn-secondary btn-sm" id="if-new-cust" style="white-space:nowrap;">+ New</button>' +
+          "</div></div>" +
+          "<div></div>" +
+          '<div><label class="form-label">Issue Date</label><input type="date" class="form-input" id="if-issue-date-d1f2" value="' +
+          (existing ? existing.issueDate : todayStr()) +
+          '"></div>' +
+          '<div><label class="form-label">Due Date</label><input type="date" class="form-input" id="if-due-date-d2f2" value="' +
+          (existing ? existing.dueDate : plus30()) +
+          '"></div>' +
+          "</div>" +
+          "</div>" +
+          '<div class="stat-card" style="margin-bottom:20px;">' +
+          '<h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 16px;">Line Items</h3>' +
+          '<div style="overflow-x:auto;">' +
+          '<table class="data-table" id="li-table-t1l2">' +
+          '<thead><tr><th style="min-width:260px;">Description</th><th style="width:90px;">Qty</th><th style="width:130px;">Unit Price</th><th style="width:90px;">Tax %</th><th style="width:130px;text-align:right;">Line Total</th><th style="width:50px;"></th></tr></thead>' +
+          "<tbody>" +
+          lineItems.map(buildRowHTML).join("") +
+          "</tbody>" +
+          "</table>" +
+          "</div>" +
+          '<button class="btn-secondary" id="add-li-btn" style="margin-top:12px;"><i data-lucide="plus" class="w-4 h-4"></i> Add Line Item</button>' +
+          '<div style="display:flex;justify-content:flex-end;margin-top:20px;">' +
+          '<div style="min-width:260px;">' +
+          '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#64748b;"><span>Subtotal</span><span id="if-subtotal-val" style="font-variant-numeric:tabular-nums;color:#334155;font-weight:600;">' +
+          fmtMoney(initTotals.subtotal) +
+          "</span></div>" +
+          '<div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#64748b;border-bottom:1px solid #e2e8f0;"><span>Tax</span><span id="if-tax-val" style="font-variant-numeric:tabular-nums;color:#334155;font-weight:600;">' +
+          fmtMoney(initTotals.taxTotal) +
+          "</span></div>" +
+          '<div style="display:flex;justify-content:space-between;padding:12px 0;font-size:18px;font-weight:700;color:#0f172a;"><span>Total</span><span id="if-total-val" style="font-variant-numeric:tabular-nums;">' +
+          fmtMoney(initTotals.total) +
+          "</span></div>" +
+          "</div>" +
+          "</div>" +
+          "</div>" +
+          '<div class="stat-card" style="margin-bottom:20px;">' +
+          '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">' +
+          '<div><label class="form-label">Notes to Customer</label><textarea class="form-input" id="if-notes-n1f2" placeholder="Additional notes...">' +
+          (existing ? existing.notes || "" : "") +
+          "</textarea></div>" +
+          '<div><label class="form-label">Payment Terms</label><textarea class="form-input" id="if-terms-t1f2">' +
+          (existing
+            ? existing.paymentTerms || ""
+            : settings.defaultPaymentTerms || "Payment due within 30 days") +
+          "</textarea></div>" +
+          "</div>" +
+          "</div>" +
+          '<div class="stat-card" style="margin-bottom:20px;">' +
+          '<h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 16px;">Payment Link</h3>' +
+          '<div style="display:flex;gap:12px;align-items:flex-end;">' +
+          '<div style="flex:1;"><label class="form-label">PayPal Email or Username</label><input class="form-input" id="if-paypal-p1f2" value="' +
+          (existing
+            ? existing.paypalEmail || ""
+            : settings.paypalUsername || "") +
+          '" placeholder="your@paypal.com"></div>' +
+          '<button class="btn-primary" id="if-gen-paypal" style="height:42px;">Generate Link</button>' +
+          "</div>" +
+          '<div id="if-paypal-result">' +
+          (existing && existing.paypalLink
+            ? '<div class="paypal-link-box"><a href="' +
+              existing.paypalLink +
+              '" target="_blank">' +
+              existing.paypalLink +
+              '</a><button class="btn-secondary btn-sm" id="if-pp-copy" style="white-space:nowrap;">Copy</button></div>'
+            : "") +
+          "</div>" +
+          "</div>" +
+          '<div style="display:flex;gap:12px;justify-content:flex-end;">' +
+          '<button class="btn-secondary" id="if-cancel-btn">Cancel</button>' +
+          '<button class="btn-primary" id="if-save-draft" style="background:#64748b;" title="Saves with selected status">Save</button>' +
+          '<button class="btn-primary" id="if-save-sent">Save &amp; Mark Sent</button>' +
+          "</div>";
+
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+
+        // Wire all row events
+        el.querySelectorAll(".li-row").forEach(wireRowEvents);
+
+        // Add line item
+        var addLiBtn = document.getElementById("add-li-btn");
+        if (addLiBtn)
+          addLiBtn.addEventListener("click", function () {
+            lineItems.push({
+              description: "",
+              qty: 1,
+              unitPrice: 0,
+              taxPct: settings.defaultTaxRate || 0,
+              lineTotal: 0,
+            });
+            rebuildLineItemsTable();
+          });
+
+        // New customer inline
+        var newCustBtn = document.getElementById("if-new-cust");
+        if (newCustBtn)
+          newCustBtn.addEventListener("click", function () {
+            openCustomerModal();
+            var obs = new MutationObserver(function () {
+              if (!document.getElementById("modal-overlay-o1v2")) {
+                obs.disconnect();
+                var custSel = document.getElementById("if-customer-c1f2");
+                if (custSel) {
+                  var curVal = custSel.value;
+                  var safeC = customers || [];
+                  custSel.innerHTML =
+                    '<option value="">Select customer...</option>' +
+                    safeC
+                      .map(function (c) {
+                        return (
+                          '<option value="' +
+                          c.id +
+                          '"' +
+                          (c.id === curVal ? " selected" : "") +
+                          ">" +
+                          c.name +
+                          " \u2014 " +
+                          (c.company || c.email) +
+                          "</option>"
+                        );
+                      })
+                      .join("");
+                  if (safeC.length > 0 && !curVal)
+                    custSel.value = safeC[safeC.length - 1].id;
+                }
+              }
+            });
+            var mc = document.getElementById("modal-container-m1c2");
+            if (mc) obs.observe(mc, { childList: true });
+          });
+
+        // PayPal link generation
+        var genPaypal = document.getElementById("if-gen-paypal");
+        if (genPaypal)
+          genPaypal.addEventListener("click", function () {
+            var valEl = document.getElementById("if-paypal-p1f2");
+            var val = valEl ? valEl.value.trim() : "";
+            if (!val) {
+              showToast("Enter PayPal email/username.", "error");
+              return;
+            }
+            var username = val.includes("@") ? val.split("@")[0] : val;
+            var t = calcTotals();
+            var link =
+              "https://www.paypal.com/paypalme/" +
+              username +
+              "/" +
+              t.total.toFixed(2);
+            var resultEl = document.getElementById("if-paypal-result");
+            if (resultEl)
+              resultEl.innerHTML =
+                '<div class="paypal-link-box"><a href="' +
+                link +
+                '" target="_blank">' +
+                link +
+                '</a><button class="btn-secondary btn-sm" id="if-pp-copy2" style="white-space:nowrap;">Copy</button></div>';
+            var copy2 = document.getElementById("if-pp-copy2");
+            if (copy2)
+              copy2.addEventListener("click", function () {
+                navigator.clipboard.writeText(link);
+                showToast("Link copied!");
+              });
+            showToast("PayPal link generated!");
+          });
+        var ppCopy = document.getElementById("if-pp-copy");
+        if (ppCopy && existing)
+          ppCopy.addEventListener("click", function () {
+            navigator.clipboard.writeText(existing.paypalLink);
+            showToast("Link copied!");
+          });
+
+        // Save handler — reads all values fresh from DOM at save time
+        async function saveInvoice(statusOverride) {
+          var customerEl = document.getElementById("if-customer-c1f2");
+          var statusEl = document.getElementById("if-status-s1f2");
+          var notesEl = document.getElementById("if-notes-n1f2");
+          var termsEl = document.getElementById("if-terms-t1f2");
+          var issueDateEl = document.getElementById("if-issue-date-d1f2");
+          var dueDateEl = document.getElementById("if-due-date-d2f2");
+          var ppEmailEl = document.getElementById("if-paypal-p1f2");
+          var customerId = customerEl ? customerEl.value : "";
+          var t = calcTotals();
+          var draftData = {
+            customerId: customerId,
+            lineItems: lineItems,
+            total: t.total,
+            issueDate: issueDateEl ? issueDateEl.value : todayStr(),
+            dueDate: dueDateEl ? dueDateEl.value : plus30(),
+          };
+          var invErr = validateInvoice(draftData);
+          if (invErr) {
+            if (!customerId && customerEl) customerEl.classList.add("error");
+            showToast(invErr, "error");
+            return;
+          }
+          var ppEmail = ppEmailEl ? ppEmailEl.value.trim() : "";
+          var ppUsername = ppEmail.includes("@")
+            ? ppEmail.split("@")[0]
+            : ppEmail;
+          var ppLink = ppEmail
+            ? "https://www.paypal.com/paypalme/" +
+              ppUsername +
+              "/" +
+              t.total.toFixed(2)
+            : existing
+              ? existing.paypalLink || ""
+              : "";
+          var now = todayStr();
+          var data = {
+            invoiceNumber: invNum,
+            customerId: customerId,
+            status: statusOverride || (statusEl ? statusEl.value : "draft"),
+            issueDate: draftData.issueDate,
+            dueDate: draftData.dueDate,
+            lineItems: lineItems,
+            subtotal: t.subtotal,
+            taxTotal: t.taxTotal,
+            total: t.total,
+            notes: notesEl ? notesEl.value.trim() : "",
+            paymentTerms: termsEl ? termsEl.value.trim() : "",
+            paypalEmail: ppEmail,
+            paypalLink: ppLink,
+            updatedAt: now,
+          };
+          if (isEdit) {
+            Object.assign(
+              existing,
+              normalizeInvoice(Object.assign({}, existing, data)),
+            );
+            showToast("Invoice updated!");
+          } else {
+            if (Array.isArray(invoices)) {
+              invoices.push(
+                normalizeInvoice(
+                  Object.assign({ id: uid(), createdAt: now }, data),
+                ),
+              );
+            }
+            invoiceCounter++;
+            showToast("Invoice created!");
+          }
+          await saveAll();
+          currentView = "invoices";
+          renderView("invoices");
+        }
+
+        var cancelBtn = document.getElementById("if-cancel-btn");
+        if (cancelBtn)
+          cancelBtn.addEventListener("click", function () {
+            currentView = "invoices";
+            renderView("invoices");
+          });
+        var saveDraftBtn = document.getElementById("if-save-draft");
+        if (saveDraftBtn)
+          saveDraftBtn.addEventListener("click", function () {
+            saveInvoice(null);
+          });
+        var saveSentBtn = document.getElementById("if-save-sent");
+        if (saveSentBtn)
+          saveSentBtn.addEventListener("click", function () {
+            saveInvoice("sent");
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  INVOICE DETAIL VIEW
+      // ══════════════════════════════
+      function renderInvoiceDetail(el) {
+        var inv = (invoices || []).find(function (x) {
+          return x && x.id === window._editInvoiceId;
+        });
+        if (!inv) {
+          setPageTitle("Invoice");
+          setHeaderActions("");
+          el.innerHTML =
+            '<div class="stat-card"><div class="empty-state"><i data-lucide="file-x" class="w-12 h-12" style="color:#ef4444;"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">Invoice not found</p><p>This invoice may have been deleted.</p><button class="btn-primary" style="margin-top:16px;" id="inv-not-found-back">Back to Invoices</button></div></div>';
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          var backBtn = document.getElementById("inv-not-found-back");
+          if (backBtn)
+            backBtn.addEventListener("click", function () {
+              currentView = "invoices";
+              renderView("invoices");
+            });
+          return;
+        }
+        var cust = getCustomer(inv.customerId);
+        setPageTitle("Invoice " + inv.invoiceNumber);
+        setHeaderActions(
+          '\
+    <button class="btn-secondary no-print" id="inv-det-back" style="margin-right:8px;"><i data-lucide="arrow-left" class="w-4 h-4"></i> Back</button>\
+    <button class="btn-secondary no-print" id="inv-det-edit" style="margin-right:8px;"><i data-lucide="pencil" class="w-4 h-4"></i> Edit</button>\
+    <button class="btn-primary no-print" id="inv-det-print"><i data-lucide="printer" class="w-4 h-4"></i> Print</button>\
+  ',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var detBack = document.getElementById("inv-det-back");
+        if (detBack)
+          detBack.addEventListener("click", function () {
+            currentView = "invoices";
+            renderView("invoices");
+          });
+        var detEdit = document.getElementById("inv-det-edit");
+        if (detEdit)
+          detEdit.addEventListener("click", function () {
+            window._editInvoiceId = inv.id;
+            currentView = "invoice-form";
+            renderView("invoice-form");
+          });
+        var detPrint = document.getElementById("inv-det-print");
+        if (detPrint)
+          detPrint.addEventListener("click", function () {
+            window.print();
+          });
+
+        var safeLineItems = inv.lineItems || [];
+
+        el.innerHTML =
+          '\
+    <div class="stat-card print-view" style="max-width:800px;margin:0 auto;padding:40px;">\
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:40px;">\
+        <div>\
+          <h2 style="font-size:28px;font-weight:700;color:#0f172a;margin:0;">' +
+          (settings.businessName || "⚡ ClientPortal") +
+          "</h2>\
+          " +
+          (settings.businessEmail
+            ? '<p style="font-size:13px;color:#64748b;margin:4px 0;">' +
+              settings.businessEmail +
+              "</p>"
+            : "") +
+          "\
+          " +
+          (settings.businessPhone
+            ? '<p style="font-size:13px;color:#64748b;margin:2px 0;">' +
+              settings.businessPhone +
+              "</p>"
+            : "") +
+          "\
+          " +
+          (settings.businessAddress
+            ? '<p style="font-size:13px;color:#64748b;margin:2px 0;white-space:pre-line;">' +
+              settings.businessAddress +
+              "</p>"
+            : "") +
+          '\
+        </div>\
+        <div style="text-align:right;">\
+          <h1 style="font-size:32px;font-weight:700;color:#6366f1;margin:0;">INVOICE</h1>\
+          <p style="font-size:16px;font-weight:600;color:#0f172a;margin:8px 0 4px;">' +
+          inv.invoiceNumber +
+          "</p>\
+          " +
+          statusBadge(inv.status) +
+          '\
+        </div>\
+      </div>\
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px;">\
+        <div>\
+          <p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin:0 0 8px;">Bill To</p>\
+          <p style="font-size:15px;font-weight:600;color:#0f172a;margin:0;">' +
+          (cust ? cust.name : "Unknown") +
+          "</p>\
+          " +
+          (cust && cust.email
+            ? '<p style="font-size:13px;color:#64748b;margin:2px 0;">' +
+              cust.email +
+              "</p>"
+            : "") +
+          "\
+          " +
+          (cust && cust.phone
+            ? '<p style="font-size:13px;color:#64748b;margin:2px 0;">' +
+              cust.phone +
+              "</p>"
+            : "") +
+          "\
+          " +
+          (cust && cust.address
+            ? '<p style="font-size:13px;color:#64748b;margin:2px 0;white-space:pre-line;">' +
+              cust.address +
+              "</p>"
+            : "") +
+          '\
+        </div>\
+        <div style="text-align:right;">\
+          <div style="margin-bottom:8px;">\
+            <span style="font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;">Issue Date</span>\
+            <p style="font-size:14px;font-weight:600;color:#0f172a;margin:2px 0;">' +
+          formatDate(inv.issueDate) +
+          '</p>\
+          </div>\
+          <div>\
+            <span style="font-size:12px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.05em;">Due Date</span>\
+            <p style="font-size:14px;font-weight:600;color:#0f172a;margin:2px 0;">' +
+          formatDate(inv.dueDate) +
+          '</p>\
+          </div>\
+        </div>\
+      </div>\
+      <div style="overflow-x:auto;margin-bottom:24px;">\
+        <table class="data-table">\
+          <thead><tr><th>Description</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Unit Price</th><th style="text-align:right;">Tax %</th><th style="text-align:right;">Total</th></tr></thead>\
+          <tbody>' +
+          safeLineItems
+            .map(function (li) {
+              return (
+                "<tr>\
+            <td>" +
+                (li.description || "—") +
+                '</td>\
+            <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                li.qty +
+                '</td>\
+            <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(li.unitPrice) +
+                '</td>\
+            <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                li.taxPct +
+                '%</td>\
+            <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(li.lineTotal) +
+                "</td>\
+          </tr>"
+              );
+            })
+            .join("") +
+          '</tbody>\
+        </table>\
+      </div>\
+      <div style="display:flex;justify-content:flex-end;margin-bottom:32px;">\
+        <div style="min-width:260px;">\
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#64748b;">\
+            <span>Subtotal</span><span style="font-variant-numeric:tabular-nums;color:#334155;font-weight:600;">' +
+          fmtMoney(inv.subtotal) +
+          '</span>\
+          </div>\
+          <div style="display:flex;justify-content:space-between;padding:8px 0;font-size:14px;color:#64748b;border-bottom:2px solid #e2e8f0;">\
+            <span>Tax</span><span style="font-variant-numeric:tabular-nums;color:#334155;font-weight:600;">' +
+          fmtMoney(inv.taxTotal) +
+          '</span>\
+          </div>\
+          <div style="display:flex;justify-content:space-between;padding:14px 0;font-size:22px;font-weight:700;color:#0f172a;">\
+            <span>Total</span><span style="font-variant-numeric:tabular-nums;">' +
+          fmtMoney(inv.total) +
+          "</span>\
+          </div>\
+        </div>\
+      </div>\
+      " +
+          (inv.notes
+            ? '<div style="margin-bottom:16px;"><p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin:0 0 6px;">Notes</p><p style="font-size:14px;color:#334155;white-space:pre-line;">' +
+              inv.notes +
+              "</p></div>"
+            : "") +
+          "\
+      " +
+          (inv.paymentTerms
+            ? '<div style="margin-bottom:16px;"><p style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;margin:0 0 6px;">Payment Terms</p><p style="font-size:14px;color:#334155;white-space:pre-line;">' +
+              inv.paymentTerms +
+              "</p></div>"
+            : "") +
+          "\
+      " +
+          (inv.paypalLink
+            ? '\
+        <div style="margin-top:24px;padding:20px;background:#f0fdf4;border-radius:12px;border:1px solid #dcfce7;">\
+          <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:#16a34a;margin:0 0 8px;">Pay Online</p>\
+          <div style="display:flex;align-items:center;gap:12px;">\
+            <a href="' +
+              inv.paypalLink +
+              '" target="_blank" style="color:#4f46e5;font-size:14px;word-break:break-all;">' +
+              inv.paypalLink +
+              '</a>\
+            <button class="btn-secondary btn-sm no-print" id="det-pp-copy" style="white-space:nowrap;">Copy</button>\
+          </div>\
+        </div>\
+      '
+            : '\
+        <div class="no-print" style="margin-top:24px;">\
+          <button class="btn-primary" id="det-gen-pp"><i data-lucide="credit-card" class="w-4 h-4"></i> Generate Payment Link</button>\
+        </div>\
+      ') +
+          "\
+    </div>\
+  ";
+
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var ppCopy = document.getElementById("det-pp-copy");
+        if (ppCopy)
+          ppCopy.addEventListener("click", function () {
+            navigator.clipboard.writeText(inv.paypalLink);
+            showToast("Link copied!");
+          });
+        var genPP = document.getElementById("det-gen-pp");
+        if (genPP)
+          genPP.addEventListener("click", function () {
+            openPayLinkModal(inv.id);
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  PAYMENTS VIEW
+      // ══════════════════════════════
+      function renderPayments(el) {
+        setPageTitle("Payments");
+        setHeaderActions("");
+        var withLinks = (invoices || []).filter(function (i) {
+          return i && i.paypalLink;
+        });
+
+        if (withLinks.length === 0) {
+          el.innerHTML =
+            '<div class="stat-card"><div class="empty-state"><i data-lucide="credit-card" class="w-12 h-12"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">No payment links yet</p><p style="font-size:14px;">Generate a PayPal link from any invoice to see it here.</p></div></div>';
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          return;
+        }
+
+        el.innerHTML =
+          '<div class="stat-card" style="padding:0;overflow:hidden;"><div style="overflow-x:auto;">\
+    <table class="data-table">\
+      <thead><tr><th>Invoice #</th><th>Customer</th><th style="text-align:right;">Amount</th><th>PayPal Link</th><th>Status</th><th style="text-align:right;">Actions</th></tr></thead>\
+      <tbody>' +
+          withLinks
+            .map(function (i) {
+              return (
+                '<tr>\
+        <td style="font-weight:600;color:#4f46e5;cursor:pointer;" class="pay-inv-link" data-id="' +
+                i.id +
+                '">' +
+                i.invoiceNumber +
+                "</td>\
+        <td>" +
+                getCustomerName(i.customerId) +
+                '</td>\
+        <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(i.total) +
+                '</td>\
+        <td><a href="' +
+                i.paypalLink +
+                '" target="_blank" style="color:#4f46e5;font-size:13px;word-break:break-all;">' +
+                i.paypalLink +
+                "</a></td>\
+        <td>" +
+                statusBadge(i.status) +
+                '</td>\
+        <td style="text-align:right;"><button class="btn-secondary btn-sm pay-copy" data-link="' +
+                i.paypalLink +
+                '"><i data-lucide="copy" class="w-4 h-4"></i> Copy</button></td>\
+      </tr>'
+              );
+            })
+            .join("") +
+          "</tbody>\
+    </table>\
+  </div></div>";
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        el.querySelectorAll(".pay-copy").forEach(function (b) {
+          b.addEventListener("click", function () {
+            navigator.clipboard.writeText(b.dataset.link);
+            showToast("Link copied!");
+          });
+        });
+        el.querySelectorAll(".pay-inv-link").forEach(function (b) {
+          b.addEventListener("click", function () {
+            window._editInvoiceId = b.dataset.id;
+            currentView = "invoice-detail";
+            renderView("invoice-detail");
+          });
+        });
+      }
+
+      // ══════════════════════════════
+      // ──  REPAIRS VIEW
+      // ══════════════════════════════
+      function renderRepairs(el) {
+        setPageTitle("Repair Received");
+        setHeaderActions(
+          '<button class="btn-primary" id="add-repair-btn"><i data-lucide="plus" class="w-4 h-4"></i> Log Repair</button>',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var addBtn = document.getElementById("add-repair-btn");
+        if (addBtn)
+          addBtn.addEventListener("click", function () {
+            openRepairModal();
+          });
+
+        var safeRepairs = repairs || [];
+        var totalCount = safeRepairs.length;
+        var inProgressCount = safeRepairs.filter(function (r) {
+          return r && r.status === "in-progress";
+        }).length;
+        var completedCount = safeRepairs.filter(function (r) {
+          return r && r.status === "completed";
+        }).length;
+        var waitingCount = safeRepairs.filter(function (r) {
+          return r && r.status === "waiting-parts";
+        }).length;
+
+        if (safeRepairs.length === 0) {
+          el.innerHTML =
+            '<div class="stat-card"><div class="empty-state"><i data-lucide="wrench" class="w-12 h-12"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">No repairs logged yet</p><p style="font-size:14px;">Log your first repair to get started.</p></div></div>';
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          return;
+        }
+
+        el.innerHTML =
+          '\
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;">\
+      <span class="pill-counter" style="background:#f1f5f9;color:#334155;"><i data-lucide="wrench" class="w-4 h-4"></i> Total: ' +
+          totalCount +
+          '</span>\
+      <span class="pill-counter" style="background:#dbeafe;color:#2563eb;"><i data-lucide="loader" class="w-4 h-4"></i> In Progress: ' +
+          inProgressCount +
+          '</span>\
+      <span class="pill-counter" style="background:#dcfce7;color:#16a34a;"><i data-lucide="check-circle" class="w-4 h-4"></i> Completed: ' +
+          completedCount +
+          '</span>\
+      <span class="pill-counter" style="background:#fef3c7;color:#d97706;"><i data-lucide="clock" class="w-4 h-4"></i> Waiting Parts: ' +
+          waitingCount +
+          '</span>\
+    </div>\
+    <div class="stat-card" style="padding:0;overflow:hidden;"><div style="overflow-x:auto;">\
+      <table class="data-table">\
+        <thead><tr><th>Repair #</th><th>Customer</th><th>Device</th><th>Issue</th><th>Status</th><th>Received</th><th>Est. Completion</th><th style="text-align:right;">Cost</th><th style="text-align:right;">Actions</th></tr></thead>\
+        <tbody>' +
+          safeRepairs
+            .map(function (r) {
+              return (
+                '<tr>\
+          <td style="font-weight:600;color:#4f46e5;">' +
+                (r.repairNumber || "—") +
+                "</td>\
+          <td>" +
+                getCustomerName(r.customerId) +
+                "</td>\
+          <td>" +
+                (r.deviceType || "—") +
+                "</td>\
+          <td>" +
+                (r.issue || "—") +
+                "</td>\
+          <td>" +
+                repairStatusBadge(r.status) +
+                '</td>\
+          <td style="color:#64748b;">' +
+                formatDate(r.receivedDate) +
+                '</td>\
+          <td style="color:#64748b;">' +
+                formatDate(r.estimatedCompletion) +
+                '</td>\
+          <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(r.estimatedCost) +
+                '</td>\
+          <td style="text-align:right;">\
+            <div style="display:flex;gap:4px;justify-content:flex-end;">\
+              <button class="action-btn repair-edit" data-id="' +
+                r.id +
+                '" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>\
+              <button class="action-btn repair-del" data-id="' +
+                r.id +
+                '" title="Delete" style="color:#dc2626;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>\
+            </div>\
+          </td>\
+        </tr>'
+              );
+            })
+            .join("") +
+          "</tbody>\
+      </table>\
+    </div></div>\
+  ";
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        el.querySelectorAll(".repair-edit").forEach(function (b) {
+          b.addEventListener("click", function () {
+            openRepairModal(b.dataset.id);
+          });
+        });
+        el.querySelectorAll(".repair-del").forEach(function (b) {
+          b.addEventListener("click", function () {
+            confirmDeleteRepair(b.dataset.id);
+          });
+        });
+      }
+
+      function openRepairModal(editId) {
+        var r = editId
+          ? (repairs || []).find(function (x) {
+              return x && x.id === editId;
+            })
+          : null;
+        var title = r ? "Edit Repair" : "Log Repair";
+        var safeCustomers = customers || [];
+        openModal(
+          '\
+    <div style="padding:28px;">\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 24px;">' +
+            title +
+            '</h2>\
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+        <div>\
+          <label class="form-label">Customer <span style="color:#ef4444;">*</span></label>\
+          <select class="form-input" id="rf-customer">\
+            <option value="">Select customer...</option>\
+            ' +
+            safeCustomers
+              .map(function (c) {
+                return (
+                  '<option value="' +
+                  c.id +
+                  '" ' +
+                  (r && r.customerId === c.id ? "selected" : "") +
+                  ">" +
+                  c.name +
+                  " — " +
+                  (c.company || c.email) +
+                  "</option>"
+                );
+              })
+              .join("") +
+            '\
+          </select>\
+        </div>\
+        <div>\
+          <label class="form-label">Device Type <span style="color:#ef4444;">*</span></label>\
+          <input class="form-input" id="rf-device" value="' +
+            (r ? r.deviceType : "") +
+            '" placeholder="e.g. MacBook Pro 14&quot;">\
+        </div>\
+        <div style="grid-column:1/-1;">\
+          <label class="form-label">Issue Description <span style="color:#ef4444;">*</span></label>\
+          <textarea class="form-input" id="rf-issue" placeholder="Describe the issue...">' +
+            (r ? r.issue : "") +
+            '</textarea>\
+        </div>\
+        <div>\
+          <label class="form-label">Status</label>\
+          <select class="form-input" id="rf-status">\
+            <option value="pending" ' +
+            (!r || r.status === "pending" ? "selected" : "") +
+            '>Pending</option>\
+            <option value="in-progress" ' +
+            (r && r.status === "in-progress" ? "selected" : "") +
+            '>In Progress</option>\
+            <option value="waiting-parts" ' +
+            (r && r.status === "waiting-parts" ? "selected" : "") +
+            '>Waiting Parts</option>\
+            <option value="completed" ' +
+            (r && r.status === "completed" ? "selected" : "") +
+            '>Completed</option>\
+          </select>\
+        </div>\
+        <div>\
+          <label class="form-label">Estimated Cost ($)</label>\
+          <input class="form-input" id="rf-cost" type="number" min="0" step="0.01" value="' +
+            (r ? r.estimatedCost : 0) +
+            '" placeholder="0.00">\
+        </div>\
+        <div>\
+          <label class="form-label">Received Date</label>\
+          <input type="date" class="form-input" id="rf-received" value="' +
+            (r ? r.receivedDate : todayStr()) +
+            '">\
+        </div>\
+        <div>\
+          <label class="form-label">Est. Completion Date</label>\
+          <input type="date" class="form-input" id="rf-completion" value="' +
+            (r ? r.estimatedCompletion : plus30()) +
+            '">\
+        </div>\
+        <div style="grid-column:1/-1;">\
+          <label class="form-label">Tech Notes</label>\
+          <textarea class="form-input" id="rf-notes" placeholder="Internal technician notes...">' +
+            (r ? r.techNotes || "" : "") +
+            '</textarea>\
+        </div>\
+      </div>\
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">\
+        <button class="btn-secondary" id="rf-cancel">Cancel</button>\
+        <button class="btn-primary" id="rf-save">Save Repair</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        var cancelBtn = document.getElementById("rf-cancel");
+        if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+        var saveBtn = document.getElementById("rf-save");
+        if (saveBtn)
+          saveBtn.addEventListener("click", async function () {
+            var customerEl = document.getElementById("rf-customer");
+            var deviceEl = document.getElementById("rf-device");
+            var issueEl = document.getElementById("rf-issue");
+            var statusEl = document.getElementById("rf-status");
+            var costEl = document.getElementById("rf-cost");
+            var receivedEl = document.getElementById("rf-received");
+            var completionEl = document.getElementById("rf-completion");
+            var notesEl = document.getElementById("rf-notes");
+
+            var customerId = customerEl ? customerEl.value : "";
+            var deviceType = deviceEl ? deviceEl.value.trim() : "";
+            var issue = issueEl ? issueEl.value.trim() : "";
+
+            var repData = {
+              customerId: customerId,
+              deviceType: deviceType,
+              issue: issue,
+              status: statusEl ? statusEl.value : "pending",
+              estimatedCost: costEl ? parseFloat(costEl.value) || 0 : 0,
+              receivedDate: receivedEl ? receivedEl.value : todayStr(),
+              estimatedCompletion: completionEl ? completionEl.value : plus30(),
+              techNotes: notesEl ? notesEl.value.trim() : "",
+              invoiceId: r ? r.invoiceId : "",
+              partIds: r ? r.partIds || [] : [],
+            };
+            var repErr = validateRepair(repData);
+            if (repErr) {
+              if (!repData.customerId && customerEl)
+                customerEl.classList.add("error");
+              if (!repData.deviceType && deviceEl)
+                deviceEl.classList.add("error");
+              if (!repData.issue && issueEl) issueEl.classList.add("error");
+              showToast(repErr, "error");
+              return;
+            }
+            var now = todayStr();
+            if (r) {
+              Object.assign(
+                r,
+                normalizeRepair(
+                  Object.assign({}, r, repData, { updatedAt: now }),
+                ),
+              );
+              showToast("Repair updated successfully.");
+            } else {
+              if (Array.isArray(repairs)) {
+                repairs.push(
+                  normalizeRepair(
+                    Object.assign(
+                      {
+                        id: uid(),
+                        repairNumber: padRep(repairCounter),
+                        createdAt: now,
+                        updatedAt: now,
+                      },
+                      repData,
+                    ),
+                  ),
+                );
+              }
+              repairCounter++;
+              showToast("Repair logged successfully.");
+            }
+            await saveAll();
+            closeModal();
+            renderView("repairs");
+          });
+      }
+
+      function confirmDeleteRepair(id) {
+        var r = (repairs || []).find(function (x) {
+          return x && x.id === id;
+        });
+        if (!r) return;
+        openModal(
+          '\
+    <div style="padding:28px;text-align:center;">\
+      <i data-lucide="alert-triangle" class="w-12 h-12" style="color:#f59e0b;margin:0 auto 16px;display:block;"></i>\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">Delete Repair?</h2>\
+      <p style="color:#64748b;font-size:14px;">Are you sure you want to delete <strong>' +
+            (r.repairNumber || "this repair") +
+            '</strong>?</p>\
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">\
+        <button class="btn-secondary" id="del-r-cancel">Cancel</button>\
+        <button class="btn-primary" id="del-r-confirm" style="background:#ef4444;">Delete</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var delCancel = document.getElementById("del-r-cancel");
+        if (delCancel) delCancel.addEventListener("click", closeModal);
+        var delConfirm = document.getElementById("del-r-confirm");
+        if (delConfirm)
+          delConfirm.addEventListener("click", async function () {
+            repairs = (repairs || []).filter(function (x) {
+              return x && x.id !== id;
+            });
+            await saveAll();
+            closeModal();
+            showToast("Repair deleted.");
+            renderView("repairs");
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  PARTS VIEW
+      // ══════════════════════════════
+      function renderParts(el) {
+        setPageTitle("Parts Order");
+        setHeaderActions(
+          '<button class="btn-primary" id="add-part-btn"><i data-lucide="plus" class="w-4 h-4"></i> Order Part</button>',
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var addBtn = document.getElementById("add-part-btn");
+        if (addBtn)
+          addBtn.addEventListener("click", function () {
+            openPartModal();
+          });
+
+        var safeParts = parts || [];
+
+        if (safeParts.length === 0) {
+          el.innerHTML =
+            '<div class="stat-card"><div class="empty-state"><i data-lucide="package" class="w-12 h-12"></i><p style="font-size:16px;font-weight:600;color:#334155;margin:8px 0 4px;">No parts orders yet</p><p style="font-size:14px;">Order your first part to get started.</p></div></div>';
+          if (
+            typeof lucide !== "undefined" &&
+            typeof lucide.createIcons === "function"
+          )
+            lucide.createIcons();
+          return;
+        }
+
+        var totalPartsOrdered = safeParts.length;
+        var totalValue = safeParts.reduce(function (s, p) {
+          return s + (p.qty || 0) * (p.unitCost || 0);
+        }, 0);
+        var receivedCount = safeParts.filter(function (p) {
+          return p && p.status === "received";
+        }).length;
+
+        el.innerHTML =
+          '\
+    <div class="stat-card" style="padding:0;overflow:hidden;margin-bottom:20px;"><div style="overflow-x:auto;">\
+      <table class="data-table">\
+        <thead><tr><th>Part Name</th><th>Part #</th><th>Supplier</th><th style="text-align:right;">Qty</th><th style="text-align:right;">Unit Cost</th><th style="text-align:right;">Total Cost</th><th>Status</th><th>Ordered</th><th>Expected</th><th style="text-align:right;">Actions</th></tr></thead>\
+        <tbody>' +
+          safeParts
+            .map(function (p) {
+              return (
+                '<tr>\
+          <td style="font-weight:600;">' +
+                (p.partName || "—") +
+                '</td>\
+          <td style="color:#64748b;">' +
+                (p.partNumber || "—") +
+                "</td>\
+          <td>" +
+                (p.supplier || "—") +
+                '</td>\
+          <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                (p.qty || 0) +
+                '</td>\
+          <td style="text-align:right;font-variant-numeric:tabular-nums;">' +
+                fmtMoney(p.unitCost) +
+                '</td>\
+          <td style="text-align:right;font-weight:600;font-variant-numeric:tabular-nums;">' +
+                fmtMoney((p.qty || 0) * (p.unitCost || 0)) +
+                "</td>\
+          <td>" +
+                partStatusBadge(p.status) +
+                '</td>\
+          <td style="color:#64748b;">' +
+                formatDate(p.orderedDate) +
+                '</td>\
+          <td style="color:#64748b;">' +
+                formatDate(p.expectedDate) +
+                '</td>\
+          <td style="text-align:right;">\
+            <div style="display:flex;gap:4px;justify-content:flex-end;">\
+              <button class="action-btn part-edit" data-id="' +
+                p.id +
+                '" title="Edit"><i data-lucide="pencil" class="w-4 h-4"></i></button>\
+              <button class="action-btn part-del" data-id="' +
+                p.id +
+                '" title="Delete" style="color:#dc2626;"><i data-lucide="trash-2" class="w-4 h-4"></i></button>\
+            </div>\
+          </td>\
+        </tr>'
+              );
+            })
+            .join("") +
+          '</tbody>\
+      </table>\
+    </div></div>\
+    <div class="stat-card">\
+      <div style="display:flex;gap:32px;flex-wrap:wrap;">\
+        <div>\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Total Parts Ordered</span>\
+          <div style="font-size:24px;font-weight:700;color:#0f172a;margin-top:4px;">' +
+          totalPartsOrdered +
+          '</div>\
+        </div>\
+        <div>\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Total Value</span>\
+          <div style="font-size:24px;font-weight:700;color:#0f172a;margin-top:4px;">' +
+          fmtMoney(totalValue) +
+          '</div>\
+        </div>\
+        <div>\
+          <span style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:#64748b;">Received</span>\
+          <div style="font-size:24px;font-weight:700;color:#16a34a;margin-top:4px;">' +
+          receivedCount +
+          "</div>\
+        </div>\
+      </div>\
+    </div>\
+  ";
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        el.querySelectorAll(".part-edit").forEach(function (b) {
+          b.addEventListener("click", function () {
+            openPartModal(b.dataset.id);
+          });
+        });
+        el.querySelectorAll(".part-del").forEach(function (b) {
+          b.addEventListener("click", function () {
+            confirmDeletePart(b.dataset.id);
+          });
+        });
+      }
+
+      function openPartModal(editId) {
+        var p = editId
+          ? (parts || []).find(function (x) {
+              return x && x.id === editId;
+            })
+          : null;
+        var title = p ? "Edit Part Order" : "Order Part";
+        openModal(
+          '\
+    <div style="padding:28px;">\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 24px;">' +
+            title +
+            '</h2>\
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+        <div>\
+          <label class="form-label">Part Name <span style="color:#ef4444;">*</span></label>\
+          <input class="form-input" id="pf-name" value="' +
+            (p ? p.partName : "") +
+            '" placeholder="e.g. Display Assembly">\
+        </div>\
+        <div>\
+          <label class="form-label">Part Number</label>\
+          <input class="form-input" id="pf-number" value="' +
+            (p ? p.partNumber : "") +
+            '" placeholder="e.g. MBPD-14-2023">\
+        </div>\
+        <div>\
+          <label class="form-label">Supplier</label>\
+          <input class="form-input" id="pf-supplier" value="' +
+            (p ? p.supplier : "") +
+            '" placeholder="Supplier name">\
+        </div>\
+        <div>\
+          <label class="form-label">Quantity</label>\
+          <input class="form-input" id="pf-qty" type="number" min="1" step="1" value="' +
+            (p ? p.qty : 1) +
+            '">\
+        </div>\
+        <div>\
+          <label class="form-label">Unit Cost ($)</label>\
+          <input class="form-input" id="pf-cost" type="number" min="0" step="0.01" value="' +
+            (p ? p.unitCost : 0) +
+            '">\
+        </div>\
+        <div>\
+          <label class="form-label">Status</label>\
+          <select class="form-input" id="pf-status">\
+            <option value="ordered" ' +
+            (!p || (p && p.status === "ordered") ? "selected" : "") +
+            '>Ordered</option>\
+            <option value="in-transit" ' +
+            (p && p.status === "in-transit" ? "selected" : "") +
+            '>In Transit</option>\
+            <option value="received" ' +
+            (p && p.status === "received" ? "selected" : "") +
+            '>Received</option>\
+            <option value="cancelled" ' +
+            (p && p.status === "cancelled" ? "selected" : "") +
+            '>Cancelled</option>\
+          </select>\
+        </div>\
+        <div>\
+          <label class="form-label">Ordered Date</label>\
+          <input type="date" class="form-input" id="pf-ordered" value="' +
+            (p ? p.orderedDate : todayStr()) +
+            '">\
+        </div>\
+        <div>\
+          <label class="form-label">Expected Date</label>\
+          <input type="date" class="form-input" id="pf-expected" value="' +
+            (p ? p.expectedDate : plus30()) +
+            '">\
+        </div>\
+        <div style="grid-column:1/-1;">\
+          <label class="form-label">Notes</label>\
+          <textarea class="form-input" id="pf-notes" placeholder="Additional notes...">' +
+            (p ? p.notes || "" : "") +
+            '</textarea>\
+        </div>\
+      </div>\
+      <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:24px;">\
+        <button class="btn-secondary" id="pf-cancel">Cancel</button>\
+        <button class="btn-primary" id="pf-save">Save Part</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        var cancelBtn = document.getElementById("pf-cancel");
+        if (cancelBtn) cancelBtn.addEventListener("click", closeModal);
+        var saveBtn = document.getElementById("pf-save");
+        if (saveBtn)
+          saveBtn.addEventListener("click", async function () {
+            var nameEl = document.getElementById("pf-name");
+            var partName = nameEl ? nameEl.value.trim() : "";
+
+            var partData = {
+              partName: partName,
+              partNumber: (
+                document.getElementById("pf-number") || { value: "" }
+              ).value.trim(),
+              supplier: (
+                document.getElementById("pf-supplier") || { value: "" }
+              ).value.trim(),
+              qty: document.getElementById("pf-qty")
+                ? parseInt(document.getElementById("pf-qty").value) || 1
+                : 1,
+              unitCost: document.getElementById("pf-cost")
+                ? parseFloat(document.getElementById("pf-cost").value) || 0
+                : 0,
+              status: document.getElementById("pf-status")
+                ? document.getElementById("pf-status").value
+                : "ordered",
+              orderedDate: document.getElementById("pf-ordered")
+                ? document.getElementById("pf-ordered").value
+                : todayStr(),
+              expectedDate: document.getElementById("pf-expected")
+                ? document.getElementById("pf-expected").value
+                : plus30(),
+              notes: document.getElementById("pf-notes")
+                ? document.getElementById("pf-notes").value.trim()
+                : "",
+              repairId: p ? p.repairId : "",
+            };
+            var partErr = validatePart(partData);
+            if (partErr) {
+              if (!partData.partName && nameEl) nameEl.classList.add("error");
+              showToast(partErr, "error");
+              return;
+            }
+            var now = todayStr();
+            if (p) {
+              Object.assign(
+                p,
+                normalizePart(
+                  Object.assign({}, p, partData, { updatedAt: now }),
+                ),
+              );
+              showToast("Part order updated.");
+            } else {
+              if (Array.isArray(parts)) {
+                parts.push(
+                  normalizePart(
+                    Object.assign(
+                      { id: uid(), createdAt: now, updatedAt: now },
+                      partData,
+                    ),
+                  ),
+                );
+              }
+              showToast("Part ordered successfully.");
+            }
+            await saveAll();
+            closeModal();
+            renderView("parts");
+          });
+      }
+
+      function confirmDeletePart(id) {
+        var p = (parts || []).find(function (x) {
+          return x && x.id === id;
+        });
+        if (!p) return;
+        openModal(
+          '\
+    <div style="padding:28px;text-align:center;">\
+      <i data-lucide="alert-triangle" class="w-12 h-12" style="color:#f59e0b;margin:0 auto 16px;display:block;"></i>\
+      <h2 style="font-size:18px;font-weight:700;color:#0f172a;margin:0 0 8px;">Delete Part Order?</h2>\
+      <p style="color:#64748b;font-size:14px;">Are you sure you want to delete <strong>' +
+            (p.partName || "this part") +
+            '</strong>?</p>\
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:24px;">\
+        <button class="btn-secondary" id="del-p-cancel">Cancel</button>\
+        <button class="btn-primary" id="del-p-confirm" style="background:#ef4444;">Delete</button>\
+      </div>\
+    </div>\
+  ',
+          "sm",
+        );
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var delCancel = document.getElementById("del-p-cancel");
+        if (delCancel) delCancel.addEventListener("click", closeModal);
+        var delConfirm = document.getElementById("del-p-confirm");
+        if (delConfirm)
+          delConfirm.addEventListener("click", async function () {
+            parts = (parts || []).filter(function (x) {
+              return x && x.id !== id;
+            });
+            await saveAll();
+            closeModal();
+            showToast("Part order deleted.");
+            renderView("parts");
+          });
+      }
+
+      // ══════════════════════════════
+      // ──  SETTINGS VIEW
+      // ══════════════════════════════
+      function renderSettings(el) {
+        setPageTitle("Settings");
+        setHeaderActions("");
+        el.innerHTML =
+          '\
+    <div class="stat-card" style="max-width:720px;">\
+      <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 24px;">Business Information</h3>\
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+        <div>\
+          <label class="form-label">Business Name</label>\
+          <input class="form-input" id="set-bname-b1s2" value="' +
+          (settings.businessName || "") +
+          '" placeholder="Your Business Name">\
+        </div>\
+        <div>\
+          <label class="form-label">Business Email</label>\
+          <input class="form-input" id="set-bemail-e1s2" type="email" value="' +
+          (settings.businessEmail || "") +
+          '" placeholder="info@business.com">\
+        </div>\
+        <div>\
+          <label class="form-label">Business Phone</label>\
+          <input class="form-input" id="set-bphone-p1s2" value="' +
+          (settings.businessPhone || "") +
+          '" placeholder="(555) 000-0000">\
+        </div>\
+        <div>\
+          <label class="form-label">PayPal Username</label>\
+          <input class="form-input" id="set-ppuser-u1s2" value="' +
+          (settings.paypalUsername || "") +
+          '" placeholder="PayPal.me username">\
+        </div>\
+      </div>\
+      <div style="margin-top:16px;">\
+        <label class="form-label">Business Address</label>\
+        <textarea class="form-input" id="set-baddr-a1s2" placeholder="Street, City, State ZIP">' +
+          (settings.businessAddress || "") +
+          '</textarea>\
+      </div>\
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid #e2e8f0;">\
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 20px;">Invoice Defaults</h3>\
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">\
+          <div>\
+            <label class="form-label">Default Tax Rate (%)</label>\
+            <input class="form-input" id="set-taxrate-t1s2" type="number" min="0" step="0.5" value="' +
+          (settings.defaultTaxRate || 0) +
+          '" placeholder="0">\
+          </div>\
+          <div></div>\
+        </div>\
+        <div style="margin-top:16px;">\
+          <label class="form-label">Default Payment Terms</label>\
+          <textarea class="form-input" id="set-pterms-p2s2">' +
+          (settings.defaultPaymentTerms || "Payment due within 30 days") +
+          '</textarea>\
+        </div>\
+      </div>\
+      <div style="margin-top:28px;padding-top:24px;border-top:1px solid #e2e8f0;">\
+        <h3 style="font-size:16px;font-weight:700;color:#0f172a;margin:0 0 12px;">Logo</h3>\
+        <div style="width:120px;height:120px;border-radius:16px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;color:#94a3b8;">\
+          <i data-lucide="image" class="w-8 h-8"></i>\
+        </div>\
+        <p style="font-size:12px;color:#94a3b8;margin-top:8px;">Logo support coming soon.</p>\
+      </div>\
+      <div style="display:flex;justify-content:flex-end;margin-top:28px;">\
+        <button class="btn-primary" id="set-save-s1b2"><i data-lucide="save" class="w-4 h-4"></i> Save Settings</button>\
+      </div>\
+    </div>\
+  ';
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+        var saveBtn = document.getElementById("set-save-s1b2");
+        if (saveBtn)
+          saveBtn.addEventListener("click", async function () {
+            var raw = {
+              businessName: (
+                document.getElementById("set-bname-b1s2") || { value: "" }
+              ).value,
+              businessEmail: (
+                document.getElementById("set-bemail-e1s2") || { value: "" }
+              ).value,
+              businessPhone: (
+                document.getElementById("set-bphone-p1s2") || { value: "" }
+              ).value,
+              businessAddress: (
+                document.getElementById("set-baddr-a1s2") || { value: "" }
+              ).value,
+              paypalUsername: (
+                document.getElementById("set-ppuser-u1s2") || { value: "" }
+              ).value,
+              defaultTaxRate:
+                parseFloat(
+                  (
+                    document.getElementById("set-taxrate-t1s2") || {
+                      value: "0",
+                    }
+                  ).value,
+                ) || 0,
+              defaultPaymentTerms: (
+                document.getElementById("set-pterms-p2s2") || { value: "" }
+              ).value,
+            };
+            settings = normalizeSettings(raw);
+            await saveAll();
+            showToast("Settings saved!");
+          });
+      }
+
+      // ── KICK OFF ──
+      init();
+
+      document.addEventListener("DOMContentLoaded", function () {
+        if (
+          typeof lucide !== "undefined" &&
+          typeof lucide.createIcons === "function"
+        )
+          lucide.createIcons();
+      });
+    </script>
+  </body>
+</html>
